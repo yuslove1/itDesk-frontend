@@ -14,14 +14,14 @@ function VerifyOtpContent() {
   const searchParams = useSearchParams();
   const email        = searchParams.get("email") ?? "";
 
-  const [digits,    setDigits]    = useState<string[]>(Array(OTP_LENGTH).fill(""));
+  const [digits,    setDigits]    = useState(Array(OTP_LENGTH).fill(""));
   const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState<string | null>(null);
+  const [error,     setError]     = useState(null);
   const [success,   setSuccess]   = useState(false);
   const [cooldown,  setCooldown]  = useState(RESEND_COOLDOWN);
   const [resending, setResending] = useState(false);
 
-  const inputRefs = useRef<Array<HTMLInputElement | null>>(Array(OTP_LENGTH).fill(null));
+  const inputRefs = useRef(Array(OTP_LENGTH).fill(null));
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -33,7 +33,7 @@ function VerifyOtpContent() {
     if (!email) router.replace("/signup");
   }, [email, router]);
 
-  const submitOtp = useCallback(async (code: string) => {
+  const submitOtp = useCallback(async (code) => {
     setError(null);
     setLoading(true);
     try {
@@ -53,7 +53,7 @@ function VerifyOtpContent() {
     }
   }, [email, router]);
 
-  function handleChange(index: number, value: string) {
+  function handleChange(index, value) {
     if (value.length === OTP_LENGTH && /^\d{6}$/.test(value)) {
       const next = value.split("");
       setDigits(next);
@@ -70,7 +70,7 @@ function VerifyOtpContent() {
     if (code.length === OTP_LENGTH && !next.includes("")) submitOtp(code);
   }
 
-  function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(index, e) {
     if (e.key === "Backspace") {
       if (digits[index]) { const next = [...digits]; next[index] = ""; setDigits(next); }
       else if (index > 0) inputRefs.current[index - 1]?.focus();
@@ -79,7 +79,7 @@ function VerifyOtpContent() {
     if (e.key === "ArrowRight" && index < OTP_LENGTH - 1) inputRefs.current[index + 1]?.focus();
   }
 
-  function handlePaste(e: React.ClipboardEvent) {
+  function handlePaste(e) {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
     if (!pasted.length) return;

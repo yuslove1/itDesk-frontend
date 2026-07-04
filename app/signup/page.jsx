@@ -26,18 +26,18 @@ export default function SignupPage() {
   const router = useRouter();
   const [name,         setName]         = useState("");
   const [email,        setEmail]        = useState("");
-  const [role,         setRole]         = useState<"staff" | "manager">("staff");
+  const [role,         setRole]         = useState("staff");
   const [password,     setPassword]     = useState("");
   const [confirm,      setConfirm]      = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm,  setShowConfirm]  = useState(false);
   const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState<string | null>(null);
+  const [error,        setError]        = useState(null);
 
   const inputCls = "w-full bg-paper border border-border rounded-[6px] px-3 py-2 font-mono text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
   const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     if (password !== confirm) { setError("Passwords do not match"); return; }
@@ -103,7 +103,7 @@ export default function SignupPage() {
             </div>
             <div>
               <label className={labelCls}>Role</label>
-              <select value={role} onChange={(e) => setRole(e.target.value as "staff" | "manager")}
+              <select value={role} onChange={(e) => setRole(e.target.value)}
                 className={cn(inputCls, "appearance-none")}>
                 <option value="staff">Intern</option>
                 <option value="manager">Manager</option>

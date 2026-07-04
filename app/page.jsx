@@ -24,9 +24,9 @@ function LoginContent() {
   const [password,     setPassword]     = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState<string | null>(null);
+  const [error,        setError]        = useState(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     setLoading(true);
