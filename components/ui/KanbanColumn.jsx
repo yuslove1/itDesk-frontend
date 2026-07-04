@@ -1,15 +1,5 @@
-import type { Task, TaskStatus } from "@/types";
 import { TaskCard } from "@/components/ui/TaskCard";
 import { cn } from "@/lib/utils";
-
-interface KanbanColumnProps {
-  title:           string;
-  tasks:           Task[];
-  dotColor:        "gray" | "amber" | "green";
-  onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
-  onDelete?:       (taskId: string) => void;
-  onEdit?:         (task: Task) => void;
-}
 
 const dotStyles = {
   gray:  "bg-ink5",
@@ -18,7 +8,7 @@ const dotStyles = {
 };
 
 /** Single Kanban column with a header dot + task count. */
-export function KanbanColumn({ title, tasks, dotColor, onStatusChange, onDelete, onEdit }: KanbanColumnProps) {
+export function KanbanColumn({ title, tasks, dotColor, onStatusChange, onDelete, onEdit }) {
   return (
     <div className="bg-surf border border-border rounded-[10px] overflow-hidden flex flex-col">
       {/* Column header */}

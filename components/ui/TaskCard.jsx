@@ -1,34 +1,24 @@
 "use client";
 
-import type { Task, TaskStatus } from "@/types";
 import { Pill } from "./Pill";
 import { Tag } from "./Tag";
 import { Avatar } from "./Avatar";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-interface TaskCardProps {
-  task:            Task;
-  muted?:          boolean;
-  className?:      string;
-  onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
-  onDelete?:       (taskId: string) => void;
-  onEdit?:         (task: Task) => void;
-}
-
-const priorityStripe: Record<Task["priority"], string> = {
+const priorityStripe = {
   high: "border-l-uac-red",
   med:  "border-l-amber",
   low:  "border-l-uac-green",
 };
 
-const priorityLabel: Record<Task["priority"], string> = {
+const priorityLabel = {
   high: "🔴 High",
   med:  "🟡 Medium",
   low:  "🟢 Low",
 };
 
-const STATUS_ACTIONS: Record<TaskStatus, { label: string; to: TaskStatus; style: string }[]> = {
+const STATUS_ACTIONS = {
   todo: [{ label: "▶ Start",   to: "wip",  style: "bg-amber-soft text-amber border-amber/30 hover:bg-amber/20" }],
   wip:  [
     { label: "✓ Done",   to: "done", style: "bg-uac-green-soft text-uac-green-dk border-uac-green/30 hover:bg-uac-green-mid/30" },
@@ -37,7 +27,7 @@ const STATUS_ACTIONS: Record<TaskStatus, { label: string; to: TaskStatus; style:
   done: [{ label: "↩ Reopen", to: "wip", style: "bg-paper text-ink4 border-border hover:border-ink4 hover:text-ink" }],
 };
 
-export function TaskCard({ task, muted, className, onStatusChange, onDelete, onEdit }: TaskCardProps) {
+export function TaskCard({ task, muted, className, onStatusChange, onDelete, onEdit }) {
   const [moving,     setMoving]     = useState(false);
   const [expanded,   setExpanded]   = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
@@ -45,7 +35,7 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
 
   const actions = STATUS_ACTIONS[task.status] ?? [];
 
-  async function handleMove(newStatus: TaskStatus) {
+  async function handleMove(newStatus) {
     if (moving || !onStatusChange) return;
     setMoving(true);
     await onStatusChange(task.id, newStatus);

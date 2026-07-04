@@ -3,41 +3,34 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { NavItem, UserRole, User } from "@/types";
 import { clearSession } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 // ── Static nav structure (counts are injected dynamically below) ────────────
-const staffNavBase: NavItem[] = [
+const staffNavBase = [
   { label: "Dashboard", icon: "⬡", href: "/dashboard" },
   { label: "Task Board", icon: "◫", href: "/tasks" },
   { label: "Daily Log", icon: "≡", href: "/log" },
   { label: "Handover Notes", icon: "⇄", href: "/handover" },
   { label: "Asset Register", icon: "◈", href: "/assets" },
 ];
-const staffShareNav: NavItem[] = [
+const staffShareNav = [
   { label: "Generate Report", icon: "↗", href: "/report" },
 ];
-const managerNavBase: NavItem[] = [
+const managerNavBase = [
   { label: "Dashboard", icon: "⬡", href: "/manager" },
   { label: "All Tasks", icon: "◫", href: "/tasks" },
   { label: "Activity Logs", icon: "≡", href: "/log" },
   { label: "Handover Notes", icon: "⇄", href: "/handover" },
   { label: "Asset Register", icon: "◈", href: "/assets" },
 ];
-const managerActionNav: NavItem[] = [
+const managerActionNav = [
   { label: "Create & Assign Task", icon: "✦", href: "/manager/create-task" },
 ];
 
-interface SidebarProps {
-  role: UserRole;
-  user: User | null;   // passed from AppShell so we can show the profile
-  onClose?: () => void;
-}
-
 // ── Single nav link ──────────────────────────────────────────────────────────
-function NavLink({ item, active, onClose }: { item: NavItem; active: boolean; onClose?: () => void }) {
+function NavLink({ item, active, onClose }) {
   return (
     <Link
       href={item.href}
@@ -70,27 +63,27 @@ function NavLink({ item, active, onClose }: { item: NavItem; active: boolean; on
 }
 
 // ── Role chip ────────────────────────────────────────────────────────────────
-const roleLabel: Record<UserRole, string> = {
+const roleLabel = {
   staff: "IT Staff",
   manager: "Manager",
   admin: "Admin",
 };
-const roleColor: Record<UserRole, string> = {
+const roleColor = {
   staff: "bg-blue-soft text-blue",
   manager: "bg-purple-soft text-purple",
   admin: "bg-uac-red-soft text-uac-red",
 };
 
 // ── Sidebar ──────────────────────────────────────────────────────────────────
-export function Sidebar({ role, user, onClose }: SidebarProps) {
+export function Sidebar({ role, user, onClose }) {
   const pathname = usePathname();
   const router = useRouter();
 
   // Live open task count fetched from the API
-  const [openCount, setOpenCount] = useState<number | null>(null);
+  const [openCount, setOpenCount] = useState(null);
 
   useEffect(() => {
-    api.get<{ tasks: { status: string }[] }>("/tasks")
+    api.get("/tasks")
       .then((res) => {
         const n = res.tasks.filter((t) => t.status !== "done").length;
         setOpenCount(n);
@@ -101,12 +94,12 @@ export function Sidebar({ role, user, onClose }: SidebarProps) {
   // Inject the live count into the task nav item
   const staffNav = staffNavBase.map((item) =>
     item.href === "/tasks" && openCount !== null
-      ? { ...item, count: openCount, countVariant: "red" as const }
+      ? { ...item, count: openCount, countVariant: "red" }
       : item,
   );
   const managerNav = managerNavBase.map((item) =>
     item.href === "/tasks" && openCount !== null
-      ? { ...item, count: openCount, countVariant: "red" as const }
+      ? { ...item, count: openCount, countVariant: "red" }
       : item,
   );
 

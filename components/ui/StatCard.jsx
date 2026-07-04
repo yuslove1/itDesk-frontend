@@ -1,13 +1,5 @@
 import { cn } from "@/lib/utils";
 
-interface StatCardProps {
-  label:    string;
-  value:    number | string;
-  detail?:  string;
-  icon?:    string;
-  variant?: "default" | "red" | "green" | "amber";
-}
-
 const variants = {
   default: {
     wrap:   "bg-surf border-border",
@@ -39,7 +31,7 @@ const variants = {
   },
 };
 
-export function StatCard({ label, value, detail, icon, variant = "default" }: StatCardProps) {
+export function StatCard({ label, value, detail, icon, variant = "default" }) {
   const v = variants[variant];
   return (
     <div className={cn("rounded-[10px] border relative overflow-hidden card-lift", v.wrap)}>

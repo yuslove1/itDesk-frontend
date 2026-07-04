@@ -1,15 +1,7 @@
-import type { UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 
-interface AvatarProps {
-  initials: string;
-  role: UserRole;
-  size?: "sm" | "md";
-  className?: string;
-}
-
 // Avatar colour by role
-const roleColor: Record<UserRole, string> = {
+const roleColor = {
   staff:   "bg-uac-green",
   manager: "bg-purple",
   admin:   "bg-uac-red",
@@ -21,7 +13,7 @@ const sizeClass = {
 };
 
 /** Circular avatar showing user initials, coloured by role. */
-export function Avatar({ initials, role, size = "md", className }: AvatarProps) {
+export function Avatar({ initials, role, size = "md", className }) {
   return (
     <div
       className={cn(

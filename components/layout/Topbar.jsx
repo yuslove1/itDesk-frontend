@@ -1,17 +1,9 @@
-import type { User } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 
-interface TopbarProps {
-  user: User | null;
-  subtitle?: string;
-  actions?: React.ReactNode;
-  onMenuToggle?: () => void;
-}
-
 /** App topbar — deep red with green underline.
  *  Shows hamburger on mobile, logo + user info always. */
-export function Topbar({ user, subtitle, actions, onMenuToggle }: TopbarProps) {
+export function Topbar({ user, subtitle, actions, onMenuToggle }) {
   return (
     <header className="bg-uac-red-deep border-b-2 border-uac-green flex items-center px-3 md:px-4 gap-2 h-[52px] shrink-0">
       {/* Hamburger — only visible on mobile */}

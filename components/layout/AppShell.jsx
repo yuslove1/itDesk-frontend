@@ -1,24 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import type { User } from "@/types";
 import { Topbar } from "./Topbar";
 import { Sidebar } from "./Sidebar";
 import { cn } from "@/lib/utils";
-
-interface AppShellProps {
-  user: User | null;
-  subtitle?: string;
-  topbarActions?: React.ReactNode;
-  children: React.ReactNode;
-}
 
 /**
  * Main app shell — responsive.
  * Desktop: sidebar grid + main area (card layout).
  * Mobile: topbar + collapsible drawer sidebar + full-width main.
  */
-export function AppShell({ user, subtitle, topbarActions, children }: AppShellProps) {
+export function AppShell({ user, subtitle, topbarActions, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

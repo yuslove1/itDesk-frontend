@@ -1,17 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { LogEntry, LogCategory } from "@/types";
 import { cn } from "@/lib/utils";
 
-interface LogEntryCardProps {
-  entry:     LogEntry;
-  compact?:  boolean;
-  onDelete?: (id: string) => Promise<void> | void;
-  onEdit?:   (id: string, content: string, category: LogCategory) => Promise<void> | void;
-}
-
-const tagColor: Record<LogEntry["category"], string> = {
+const tagColor = {
   routine:  "bg-uac-green-soft text-uac-green-dk",
   hardware: "bg-amber-soft text-amber",
   network:  "bg-blue-soft text-blue",
@@ -19,19 +11,19 @@ const tagColor: Record<LogEntry["category"], string> = {
   setup:    "bg-uac-green-soft text-uac-green-dk",
 };
 
-const categories: LogCategory[] = ["routine", "hardware", "network", "software", "setup"];
+const categories = ["routine", "hardware", "network", "software", "setup"];
 
 // Threshold (chars) above which we show "show more"
 const TRUNCATE_AT = 90;
 
-export function LogEntryCard({ entry, compact, onDelete, onEdit }: LogEntryCardProps) {
+export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
   const [confirmDel,    setConfirmDel]    = useState(false);
   const [deleting,      setDeleting]      = useState(false);
   const [editing,       setEditing]       = useState(false);
   const [saving,        setSaving]        = useState(false);
   const [expanded,      setExpanded]      = useState(false);
   const [editContent,   setEditContent]   = useState(entry.description);
-  const [editCategory,  setEditCategory]  = useState<LogCategory>(entry.category);
+  const [editCategory,  setEditCategory]  = useState(entry.category);
 
   const isTruncatable = entry.description.length > TRUNCATE_AT;
   const displayText   = !expanded && isTruncatable
@@ -87,7 +79,7 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }: LogEntryCardP
             <select
               className={inputCls}
               value={editCategory}
-              onChange={(e) => setEditCategory(e.target.value as LogCategory)}
+              onChange={(e) => setEditCategory(e.target.value)}
             >
               {categories.map((c) => (
                 <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>

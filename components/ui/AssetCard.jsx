@@ -1,29 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import type { Asset, AssetType, AssetStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
-const typeIcon: Record<AssetType, string> = {
+const typeIcon = {
   laptop: "💻", desktop: "🖥", printer: "🖨", ups: "⚡",
   switch: "🔀", server: "🗄", monitor: "🖵", phone: "📱",
   keyboard: "⌨", other: "📦",
 };
 
-const statusStyles: Record<AssetStatus, { pill: string; dot: string; label: string }> = {
+const statusStyles = {
   active:     { pill: "bg-uac-green-soft text-uac-green-dk", dot: "bg-uac-green",  label: "Active"     },
   in_repair:  { pill: "bg-amber-soft text-amber",           dot: "bg-amber",       label: "In Repair"  },
   retired:    { pill: "bg-paper text-ink5 border border-border", dot: "bg-ink5",   label: "Retired"    },
   unassigned: { pill: "bg-blue-soft text-blue",             dot: "bg-blue",        label: "Unassigned" },
 };
 
-interface AssetCardProps {
-  asset:     Asset;
-  onDelete?: (id: string) => void;
-  onEdit?:   (asset: Asset) => void;
-}
-
-export function AssetCard({ asset, onDelete, onEdit }: AssetCardProps) {
+export function AssetCard({ asset, onDelete, onEdit }) {
   const { pill, dot, label } = statusStyles[asset.status];
   const muted = asset.status === "retired";
   const [confirmDel, setConfirmDel] = useState(false);

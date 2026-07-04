@@ -1,13 +1,7 @@
-import type { TaskCategory } from "@/types";
 import { cn } from "@/lib/utils";
 
-interface TagProps {
-  category: TaskCategory;
-  className?: string;
-}
-
 // Category → style
-const styles: Record<TaskCategory, string> = {
+const styles = {
   hardware: "bg-amber-soft text-amber",
   network:  "bg-blue-soft text-blue",
   software: "bg-purple-soft text-purple",
@@ -15,7 +9,7 @@ const styles: Record<TaskCategory, string> = {
 };
 
 /** Small square category tag (hardware / network / software / urgent). */
-export function Tag({ category, className }: TagProps) {
+export function Tag({ category, className }) {
   return (
     <span
       className={cn(

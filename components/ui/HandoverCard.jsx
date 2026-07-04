@@ -1,18 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { HandoverNote } from "@/types";
 import { cn } from "@/lib/utils";
-
-interface HandoverCardProps {
-  note:      HandoverNote;
-  onDelete?: (id: string) => void;
-  onEdit?:   (note: HandoverNote) => void;
-}
 
 const TRUNCATE_AT = 120; // chars before we add "show more"
 
-export function HandoverCard({ note, onDelete, onEdit }: HandoverCardProps) {
+export function HandoverCard({ note, onDelete, onEdit }) {
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
   const [expanded,   setExpanded]   = useState(false);
