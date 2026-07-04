@@ -7,11 +7,10 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { Asset, AssetType, AssetStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
-function mapAsset(r: any): Asset {
+function mapAsset(r) {
   return {
     id:            r.id,
     name:          r.name,
@@ -31,7 +30,7 @@ function mapAsset(r: any): Asset {
 }
 
 // ── Filter options ─────────────────────────────────────────────────────────────
-const TYPE_OPTIONS: { label: string; value: AssetType | "all" }[] = [
+const TYPE_OPTIONS = [
   { label: "All types",   value: "all"      },
   { label: "💻 Laptop",   value: "laptop"   },
   { label: "🖥 Desktop",  value: "desktop"  },
@@ -44,7 +43,7 @@ const TYPE_OPTIONS: { label: string; value: AssetType | "all" }[] = [
   { label: "⌨ Keyboard", value: "keyboard" },
   { label: "📦 Other",    value: "other"    },
 ];
-const STATUS_OPTIONS: { label: string; value: AssetStatus | "all" }[] = [
+const STATUS_OPTIONS = [
   { label: "All statuses", value: "all"        },
   { label: "Active",       value: "active"     },
   { label: "In Repair",    value: "in_repair"  },
@@ -52,7 +51,7 @@ const STATUS_OPTIONS: { label: string; value: AssetStatus | "all" }[] = [
   { label: "Retired",      value: "retired"    },
 ];
 
-function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function FilterPill({ label, active, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -72,13 +71,7 @@ const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1
 const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
 
 // ── Shared asset form fields ───────────────────────────────────────────────────
-function AssetFormFields({
-  form,
-  set,
-}: {
-  form: Record<string, string>;
-  set: (field: string, value: string) => void;
-}) {
+function AssetFormFields({ form, set }) {
   return (
     <>
       <div className="mb-3">
@@ -136,29 +129,29 @@ function AssetFormFields({
 }
 
 // ── Add Asset form ─────────────────────────────────────────────────────────────
-function AddAssetForm({ onClose, onCreated }: { onClose: () => void; onCreated: (a: Asset) => void }) {
+function AddAssetForm({ onClose, onCreated }) {
   const [form, setForm] = useState({
     name: "", type: "laptop", status: "active",
     serialNumber: "", location: "", department: "",
     warrantyExpiry: "", notes: "",
   });
   const [saving, setSaving] = useState(false);
-  const [error,  setError]  = useState<string | null>(null);
+  const [error,  setError]  = useState(null);
 
-  function set(field: string, value: string) {
+  function set(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     setSaving(true);
     try {
       const payload = { ...form, type: form.type === "switch" ? "switch_device" : form.type };
-      const res = await api.post<{ asset: any }>("/assets", payload);
+      const res = await api.post("/assets", payload);
       onCreated(mapAsset(res.asset));
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to register asset");
     } finally {
       setSaving(false);
@@ -184,15 +177,7 @@ function AddAssetForm({ onClose, onCreated }: { onClose: () => void; onCreated: 
 }
 
 // ── Edit Asset modal ───────────────────────────────────────────────────────────
-function EditAssetModal({
-  asset,
-  onClose,
-  onUpdated,
-}: {
-  asset: Asset;
-  onClose: () => void;
-  onUpdated: (a: Asset) => void;
-}) {
+function EditAssetModal({ asset, onClose, onUpdated }) {
   const [form, setForm] = useState({
     name:           asset.name,
     type:           asset.type,
@@ -204,13 +189,13 @@ function EditAssetModal({
     notes:          asset.notes          ?? "",
   });
   const [saving, setSaving] = useState(false);
-  const [error,  setError]  = useState<string | null>(null);
+  const [error,  setError]  = useState(null);
 
-  function set(field: string, value: string) {
+  function set(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     setSaving(true);
@@ -222,10 +207,10 @@ function EditAssetModal({
         warrantyExpiry: form.warrantyExpiry || undefined,
         notes:          form.notes          || undefined,
       };
-      const res = await api.patch<{ asset: any }>(`/assets/${asset.id}`, payload);
+      const res = await api.patch(`/assets/${asset.id}`, payload);
       onUpdated(mapAsset(res.asset));
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to update asset");
     } finally {
       setSaving(false);
@@ -263,17 +248,17 @@ function EditAssetModal({
 export default function AssetsPage() {
   const user = useCurrentUser();
 
-  const [assets,        setAssets]        = useState<Asset[]>([]);
+  const [assets,        setAssets]        = useState([]);
   const [loading,       setLoading]       = useState(true);
-  const [typeFilter,    setTypeFilter]    = useState<AssetType | "all">("all");
-  const [statusFilter,  setStatusFilter]  = useState<AssetStatus | "all">("all");
+  const [typeFilter,    setTypeFilter]    = useState("all");
+  const [statusFilter,  setStatusFilter]  = useState("all");
   const [showForm,      setShowForm]      = useState(false);
-  const [editingAsset,  setEditingAsset]  = useState<Asset | null>(null);
+  const [editingAsset,  setEditingAsset]  = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
 
   useEffect(() => {
-    api.get<{ assets: any[] }>("/assets")
+    api.get("/assets")
       .then((res) => setAssets(res.assets.map(mapAsset)))
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -289,16 +274,16 @@ export default function AssetsPage() {
   const inRepair   = assets.filter((a) => a.status === "in_repair").length;
   const unassigned = assets.filter((a) => a.status === "unassigned").length;
 
-  async function handleDeleteAsset(id: string) {
+  async function handleDeleteAsset(id) {
     try {
       await api.delete(`/assets/${id}`);
       setAssets((prev) => prev.filter((a) => a.id !== id));
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete asset failed:", err);
     }
   }
 
-  function handleAssetUpdated(updated: Asset) {
+  function handleAssetUpdated(updated) {
     setAssets((prev) => prev.map((a) => a.id === updated.id ? updated : a));
   }
 
@@ -331,12 +316,12 @@ export default function AssetsPage() {
             <div className="mb-3 space-y-2">
               <div className="flex gap-1.5 flex-wrap">
                 {TYPE_OPTIONS.map((o) => (
-                  <FilterPill key={o.value} label={o.label} active={typeFilter === o.value} onClick={() => setTypeFilter(o.value as AssetType | "all")} />
+                  <FilterPill key={o.value} label={o.label} active={typeFilter === o.value} onClick={() => setTypeFilter(o.value)} />
                 ))}
               </div>
               <div className="flex gap-1.5 flex-wrap">
                 {STATUS_OPTIONS.map((o) => (
-                  <FilterPill key={o.value} label={o.label} active={statusFilter === o.value} onClick={() => setStatusFilter(o.value as AssetStatus | "all")} />
+                  <FilterPill key={o.value} label={o.label} active={statusFilter === o.value} onClick={() => setStatusFilter(o.value)} />
                 ))}
               </div>
             </div>

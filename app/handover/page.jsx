@@ -7,10 +7,9 @@ import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { HandoverNote } from "@/types";
 import { cn } from "@/lib/utils";
 
-function mapNote(r: any): HandoverNote {
+function mapNote(r) {
   return {
     id: r.id,
     title: r.title,
@@ -26,33 +25,25 @@ const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1
 const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
 
 // ── Edit Note modal ─────────────────────────────────────────────────────────
-function EditNoteModal({
-  note,
-  onClose,
-  onUpdated,
-}: {
-  note: HandoverNote;
-  onClose: () => void;
-  onUpdated: (n: HandoverNote) => void;
-}) {
+function EditNoteModal({ note, onClose, onUpdated }) {
   const [title, setTitle] = useState(note.title);
   const [content, setContent] = useState(note.content);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
     setError(null);
     setSaving(true);
     try {
-      const res = await api.patch<{ note: any }>(`/handover/${note.id}`, {
+      const res = await api.patch(`/handover/${note.id}`, {
         title: title.trim(),
         content: content.trim(),
       });
       onUpdated(mapNote(res.note));
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to update note");
     } finally {
       setSaving(false);
@@ -110,53 +101,53 @@ function EditNoteModal({
 export default function HandoverPage() {
   const user = useCurrentUser();
 
-  const [notes, setNotes] = useState<HandoverNote[]>([]);
+  const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [editingNote, setEditingNote] = useState<HandoverNote | null>(null);
+  const [editingNote, setEditingNote] = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
 
   useEffect(() => {
-    api.get<{ notes: any[] }>("/handover")
+    api.get("/handover")
       .then((res) => setNotes(res.notes.map(mapNote)))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
     setError(null);
     setSaving(true);
     try {
-      const res = await api.post<{ note: any }>("/handover", {
+      const res = await api.post("/handover", {
         title: title.trim(),
         content: content.trim(),
       });
       setNotes((prev) => [mapNote(res.note), ...prev]);
       setTitle("");
       setContent("");
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to save note");
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleDeleteNote(id: string) {
+  async function handleDeleteNote(id) {
     try {
       await api.delete(`/handover/${id}`);
       setNotes((prev) => prev.filter((n) => n.id !== id));
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete note failed:", err);
     }
   }
 
-  function handleNoteUpdated(updated: HandoverNote) {
+  function handleNoteUpdated(updated) {
     setNotes((prev) => prev.map((n) => n.id === updated.id ? updated : n));
   }
 

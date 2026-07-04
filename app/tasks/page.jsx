@@ -6,13 +6,12 @@ import { KanbanColumn } from "@/components/ui/KanbanColumn";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { Task, TaskCategory, Priority, TaskStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
-function mapTask(r: any): Task {
+function mapTask(r) {
   const initials = r.author?.name
-    ? r.author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+    ? r.author.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "IT";
   return {
     id: r.id,
@@ -35,8 +34,8 @@ function mapTask(r: any): Task {
   };
 }
 
-const CATEGORIES: TaskCategory[] = ["hardware", "network", "software", "urgent"];
-const PRIORITIES: { value: Priority; label: string }[] = [
+const CATEGORIES = ["hardware", "network", "software", "urgent"];
+const PRIORITIES = [
   { value: "high", label: "🔴 High" },
   { value: "med",  label: "🟡 Medium" },
   { value: "low",  label: "🟢 Low" },
@@ -47,27 +46,21 @@ const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1
 const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
 
 // ── Add Task modal ────────────────────────────────────────────────────────────
-function AddTaskForm({
-  onClose,
-  onCreated,
-}: {
-  onClose: () => void;
-  onCreated: (task: Task) => void;
-}) {
+function AddTaskForm({ onClose, onCreated }) {
   const [title,       setTitle]       = useState("");
   const [description, setDescription] = useState("");
-  const [category,    setCategory]    = useState<TaskCategory>("hardware");
-  const [priority,    setPriority]    = useState<Priority>("med");
+  const [category,    setCategory]    = useState("hardware");
+  const [priority,    setPriority]    = useState("med");
   const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
+  const [error,       setError]       = useState(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim()) return;
     setError(null);
     setSaving(true);
     try {
-      const res = await api.post<{ task: any }>("/tasks", {
+      const res = await api.post("/tasks", {
         title: title.trim(),
         description: description.trim() || undefined,
         category,
@@ -76,7 +69,7 @@ function AddTaskForm({
       });
       onCreated(mapTask(res.task));
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to create task");
     } finally {
       setSaving(false);
@@ -119,13 +112,13 @@ function AddTaskForm({
         <div className="grid grid-cols-2 gap-2.5 mb-4">
           <div>
             <label className={labelCls}>Category</label>
-            <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value as TaskCategory)}>
+            <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
           <div>
             <label className={labelCls}>Priority</label>
-            <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value as Priority)}>
+            <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value)}>
               {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
           </div>
@@ -149,29 +142,21 @@ function AddTaskForm({
 }
 
 // ── Edit Task modal ───────────────────────────────────────────────────────────
-function EditTaskForm({
-  task,
-  onClose,
-  onUpdated,
-}: {
-  task: Task;
-  onClose: () => void;
-  onUpdated: (task: Task) => void;
-}) {
+function EditTaskForm({ task, onClose, onUpdated }) {
   const [title,       setTitle]       = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
-  const [category,    setCategory]    = useState<TaskCategory>(task.category);
-  const [priority,    setPriority]    = useState<Priority>(task.priority);
+  const [category,    setCategory]    = useState(task.category);
+  const [priority,    setPriority]    = useState(task.priority);
   const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
+  const [error,       setError]       = useState(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim()) return;
     setError(null);
     setSaving(true);
     try {
-      const res = await api.patch<{ task: any }>(`/tasks/${task.id}`, {
+      const res = await api.patch(`/tasks/${task.id}`, {
         title: title.trim(),
         description: description.trim() || undefined,
         category,
@@ -179,7 +164,7 @@ function EditTaskForm({
       });
       onUpdated(mapTask(res.task));
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to update task");
     } finally {
       setSaving(false);
@@ -221,13 +206,13 @@ function EditTaskForm({
         <div className="grid grid-cols-2 gap-2.5 mb-4">
           <div>
             <label className={labelCls}>Category</label>
-            <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value as TaskCategory)}>
+            <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
             </select>
           </div>
           <div>
             <label className={labelCls}>Priority</label>
-            <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value as Priority)}>
+            <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value)}>
               {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
           </div>
@@ -253,22 +238,22 @@ function EditTaskForm({
 // ── Tasks Page ────────────────────────────────────────────────────────────────
 export default function TasksPage() {
   const user = useCurrentUser();
-  const [tasks,       setTasks]       = useState<Task[]>([]);
+  const [tasks,       setTasks]       = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [showForm,    setShowForm]    = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
 
   useEffect(() => {
-    api.get<{ tasks: any[] }>("/tasks")
+    api.get("/tasks")
       .then((res) => setTasks(res.tasks.map(mapTask)))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
   // ── Optimistic status move ─────────────────────────────────────────────────
-  async function handleStatusChange(taskId: string, newStatus: TaskStatus) {
+  async function handleStatusChange(taskId, newStatus) {
     const prev = tasks.find((t) => t.id === taskId)?.status;
     setTasks((all) => all.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
     try {
@@ -280,17 +265,17 @@ export default function TasksPage() {
   }
 
   // ── Delete task ────────────────────────────────────────────────────────────
-  async function handleDeleteTask(taskId: string) {
+  async function handleDeleteTask(taskId) {
     try {
       await api.delete(`/tasks/${taskId}`);
       setTasks((all) => all.filter((t) => t.id !== taskId));
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete task failed:", err);
     }
   }
 
   // ── Update task after edit ─────────────────────────────────────────────────
-  function handleTaskUpdated(updated: Task) {
+  function handleTaskUpdated(updated) {
     setTasks((all) => all.map((t) => t.id === updated.id ? updated : t));
   }
 

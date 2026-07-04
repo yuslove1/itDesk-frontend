@@ -6,11 +6,10 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { LogEntry, LogCategory } from "@/types";
 
-const categories: LogCategory[] = ["routine", "hardware", "network", "software", "setup"];
+const categories = ["routine", "hardware", "network", "software", "setup"];
 
-function mapLog(r: any): LogEntry {
+function mapLog(r) {
   return {
     id: r.id,
     time: r.logDate
@@ -26,36 +25,36 @@ export default function LogPage() {
   const user = useCurrentUser();
 
   const [description, setDescription] = useState("");
-  const [category,    setCategory]    = useState<LogCategory>("routine");
-  const [entries,     setEntries]     = useState<LogEntry[]>([]);
+  const [category,    setCategory]    = useState("routine");
+  const [entries,     setEntries]     = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
+  const [error,       setError]       = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
 
   // Load today's logs on mount
   useEffect(() => {
-    api.get<{ logs: any[] }>("/logs")
+    api.get("/logs")
       .then((res) => setEntries(res.logs.map(mapLog)))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!description.trim()) return;
     setError(null);
     setSaving(true);
     try {
-      const res = await api.post<{ log: any }>("/logs", {
+      const res = await api.post("/logs", {
         content: description.trim(),
         category,
       });
       // Prepend the new entry to the list
       setEntries((prev) => [mapLog(res.log), ...prev]);
       setDescription("");
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to save log entry");
     } finally {
       setSaving(false);
@@ -63,23 +62,23 @@ export default function LogPage() {
   }
 
   // ── Delete a log entry (admin/manager only) ────────────────────────────────
-  async function handleDeleteLog(id: string) {
+  async function handleDeleteLog(id) {
     try {
       await api.delete(`/logs/${id}`);
       setEntries((prev) => prev.filter((e) => e.id !== id));
-    } catch (err: any) {
+    } catch (err) {
       console.error("Delete log failed:", err);
     }
   }
 
   // ── Edit a log entry (admin/manager only) ─────────────────────────────────
-  async function handleEditLog(id: string, content: string, category: LogCategory) {
+  async function handleEditLog(id, content, category) {
     try {
-      const res = await api.patch<{ log: any }>(`/logs/${id}`, { content, category });
+      const res = await api.patch(`/logs/${id}`, { content, category });
       setEntries((prev) =>
         prev.map((e) => e.id === id ? mapLog(res.log) : e),
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error("Edit log failed:", err);
       throw err; // re-throw so the card can show the error state
     }
@@ -126,7 +125,7 @@ export default function LogPage() {
               <select
                 className="w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none appearance-none"
                 value={category}
-                onChange={(e) => setCategory(e.target.value as LogCategory)}
+                onChange={(e) => setCategory(e.target.value)}
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
