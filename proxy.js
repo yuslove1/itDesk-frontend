@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// proxy.ts — Route protection (Next.js 16 "Proxy", formerly middleware.ts)
+// proxy.js — Route protection (Next.js 16 "Proxy", formerly middleware.ts)
 //
 // WHAT THIS FILE DOES:
 // It runs on the SERVER before any page renders. It checks for the
@@ -18,7 +18,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
 // Routes that require login
 const PROTECTED_PATHS = [
@@ -33,7 +32,7 @@ const PROTECTED_PATHS = [
 // Routes only managers can access
 const MANAGER_ONLY_PATHS = ["/manager"];
 
-export function proxy(request: NextRequest) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // Check if this is a protected route
