@@ -12,16 +12,16 @@ export default function GenerateReportPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState<string | null>(null);
+  const [error,   setError]   = useState(null);
 
   async function handleGenerate() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.post<{ token: string; url: string }>("/reports", {});
+      const res = await api.post("/reports", {});
       // Navigate to the public snapshot page
       router.push(`/report/${res.token}`);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to generate report");
       setLoading(false);
     }

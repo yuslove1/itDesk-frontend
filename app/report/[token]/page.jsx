@@ -1,39 +1,32 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
-// ── Types matching the snapshot stored in the DB ──────────────────────────────
-interface SnapLog    { id: string; time?: string; description?: string; content?: string; category?: string; logDate?: string }
-interface SnapTask   { id: string; title: string; priority: string; status: string }
-interface SnapNote   { id: string; title: string; content: string }
-interface Snapshot {
-  generatedAt:   string;
-  generatedBy:   { name: string; role: string };
-  stats:         { todo: number; wip: number; done: number };
-  logs:          SnapLog[];
-  openTasks:     SnapTask[];
-  handoverNotes: SnapNote[];
-}
+// Snapshot shape matches what's stored in the DB:
+// { generatedAt, generatedBy: { name, role }, stats: { todo, wip, done },
+//   logs: [{ id, time?, description?, content?, category?, logDate? }],
+//   openTasks: [{ id, title, priority, status }],
+//   handoverNotes: [{ id, title, content }] }
 
 // Priority label → colour
-const priorityColor: Record<string, string> = {
+const priorityColor = {
   high: "text-uac-red",
   med:  "text-amber",
   low:  "text-ink4",
 };
-const priorityLabel: Record<string, string> = {
+const priorityLabel = {
   high: "HIGH", med: "MED", low: "LOW",
 };
 
 // ── Public snapshot page ───────────────────────────────────────────────────────
 export default function ReportPage() {
   const params = useParams();
-  const token  = params?.token as string;
+  const token  = params?.token;
 
-  const [snapshot,  setSnapshot]  = useState<Snapshot | null>(null);
-  const [expiresAt, setExpiresAt] = useState<string | null>(null);
-  const [status,    setStatus]    = useState<"loading" | "ok" | "expired" | "notfound" | "error">("loading");
+  const [snapshot,  setSnapshot]  = useState(null);
+  const [expiresAt, setExpiresAt] = useState(null);
+  const [status,    setStatus]    = useState("loading");
   const [copied,    setCopied]    = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -236,7 +229,7 @@ export default function ReportPage() {
 }
 
 // ── Error / status screen ────────────────────────────────────────────────────
-function StatusPage({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+function StatusPage({ icon, title, sub }) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-paper p-6">
       <div className="text-center max-w-sm">
