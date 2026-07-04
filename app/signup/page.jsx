@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 function EyeIcon() {
@@ -44,15 +45,10 @@ export default function SignupPage() {
     if (password.length < 8)  { setError("Password must be at least 8 characters"); return; }
     setLoading(true);
     try {
-      const res  = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), password, role }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Registration failed"); return; }
+      await api.post("/auth/register", { name: name.trim(), email: email.trim(), password, role });
       router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
-    } catch {
-      setError("Could not connect to the server.");
+    } catch (err) {
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }

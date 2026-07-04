@@ -3,9 +3,8 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { saveSession } from "@/lib/auth";
+import { api } from "@/lib/api";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN = 60;
 
@@ -37,17 +36,12 @@ function VerifyOtpContent() {
     setError(null);
     setLoading(true);
     try {
-      const res  = await fetch(`${API}/api/auth/verify-otp`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: code }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Verification failed"); return; }
+      // Session cookie is set automatically via Set-Cookie on this response.
+      const data = await api.post("/auth/verify-otp", { email, otp: code });
       setSuccess(true);
-      saveSession(data.token, data.user);
       setTimeout(() => router.push(data.user.role === "manager" ? "/manager" : "/dashboard"), 800);
-    } catch {
-      setError("Could not connect to the server.");
+    } catch (err) {
+      setError(err.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -95,17 +89,12 @@ function VerifyOtpContent() {
     setResending(true);
     setError(null);
     try {
-      const res  = await fetch(`${API}/api/auth/resend-otp`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || "Failed to resend"); return; }
+      await api.post("/auth/resend-otp", { email });
       setDigits(Array(OTP_LENGTH).fill(""));
       setCooldown(RESEND_COOLDOWN);
       inputRefs.current[0]?.focus();
-    } catch {
-      setError("Could not connect to the server.");
+    } catch (err) {
+      setError(err.message || "Failed to resend");
     } finally {
       setResending(false);
     }

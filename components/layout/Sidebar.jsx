@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearSession } from "@/lib/auth";
+import { logout } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -108,8 +108,9 @@ export function Sidebar({ role, user, onClose }) {
   const primaryLabel = role === "manager" ? "Overview" : "Main";
   const secondaryLabel = role === "manager" ? "Actions" : "Share";
 
-  function handleSignOut() {
-    clearSession();
+  async function handleSignOut() {
+    // Destroys the session server-side — a real round-trip, not just a local reset.
+    await logout();
     router.push("/");
   }
 

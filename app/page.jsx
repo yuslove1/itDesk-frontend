@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { saveSession } from "@/lib/auth";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const features = [
@@ -31,26 +31,16 @@ function LoginContent() {
     setError(null);
     setLoading(true);
     try {
-      const res  = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.requiresVerification) {
-          router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
-          return;
-        }
-        setError(data.error || "Login failed");
+      // The session cookie is set automatically via this response's Set-Cookie
+      // header — there's nothing left to store client-side afterward.
+      const data = await api.post("/auth/login", { email, password });
+      router.push(data.user.role === "manager" ? "/manager" : "/dashboard");
+    } catch (err) {
+      if (err.response?.data?.requiresVerification) {
+        router.push(`/verify-otp?email=${encodeURIComponent(err.response.data.email)}`);
         return;
       }
-
-      saveSession(data.token, data.user);
-      router.push(data.user.role === "manager" ? "/manager" : "/dashboard");
-    } catch {
-      setError("Could not connect to the server. Is the API running?");
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
