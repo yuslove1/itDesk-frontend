@@ -10,14 +10,12 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { Task, TaskCategory, Priority } from "@/types";
 import { cn } from "@/lib/utils";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-interface StaffUser { id: string; name: string; email: string; role: string }
+// StaffUser shape: { id: string, name: string, email: string, role: string }
 
-const CATEGORIES: TaskCategory[] = ["hardware", "network", "software", "urgent"];
-const PRIORITIES: { value: Priority; label: string }[] = [
+const CATEGORIES = ["hardware", "network", "software", "urgent"];
+const PRIORITIES = [
   { value: "high", label: "🔴 High" },
   { value: "med",  label: "🟡 Medium" },
   { value: "low",  label: "🟢 Low" },
@@ -31,11 +29,11 @@ export default function CreateTaskPage() {
   const router = useRouter();
 
   // ── Staff list ──────────────────────────────────────────────────────────────
-  const [staff,        setStaff]        = useState<StaffUser[]>([]);
+  const [staff,        setStaff]        = useState([]);
   const [staffLoading, setStaffLoading] = useState(true);
 
   useEffect(() => {
-    api.get<{ users: StaffUser[] }>("/users")
+    api.get("/users")
       .then((res) => setStaff(res.users))
       .catch(console.error)
       .finally(() => setStaffLoading(false));
@@ -44,17 +42,17 @@ export default function CreateTaskPage() {
   // ── Form state ──────────────────────────────────────────────────────────────
   const [title,       setTitle]       = useState("");
   const [description, setDescription] = useState("");
-  const [category,    setCategory]    = useState<TaskCategory>("network");
-  const [priority,    setPriority]    = useState<Priority>("high");
-  const [assigneeId,  setAssigneeId]  = useState<string>("");
+  const [category,    setCategory]    = useState("network");
+  const [priority,    setPriority]    = useState("high");
+  const [assigneeId,  setAssigneeId]  = useState("");
   const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
+  const [error,       setError]       = useState(null);
 
   // Derived: selected assignee object for the preview card
   const selectedStaff = staff.find((s) => s.id === assigneeId) ?? null;
 
   // Live preview task (updates as manager types)
-  const previewTask: Task = {
+  const previewTask = {
     id: "preview",
     title: title.trim() || "Task title will appear here…",
     category,
@@ -76,7 +74,7 @@ export default function CreateTaskPage() {
     createdAt: "just now",
   };
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!title.trim()) return;
     setError(null);
@@ -91,7 +89,7 @@ export default function CreateTaskPage() {
         assignedTo: assigneeId || undefined,
       });
       router.push("/manager");
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message ?? "Failed to create task");
       setSaving(false);
     }
@@ -139,13 +137,13 @@ export default function CreateTaskPage() {
           <div className="grid grid-cols-2 gap-2.5 mb-3">
             <div>
               <label className={labelCls}>Category</label>
-              <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value as TaskCategory)}>
+              <select className={inputCls} value={category} onChange={(e) => setCategory(e.target.value)}>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
               </select>
             </div>
             <div>
               <label className={labelCls}>Priority</label>
-              <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value as Priority)}>
+              <select className={inputCls} value={priority} onChange={(e) => setPriority(e.target.value)}>
                 {PRIORITIES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>

@@ -9,12 +9,11 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { Task, LogEntry, TaskStatus } from "@/types";
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
-function mapTask(r: any): Task {
+function mapTask(r) {
   const initials = r.author?.name
-    ? r.author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+    ? r.author.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "IT";
   return {
     id: r.id, title: r.title, description: r.description ?? undefined,
@@ -25,7 +24,7 @@ function mapTask(r: any): Task {
   };
 }
 
-function mapLog(r: any): LogEntry {
+function mapLog(r) {
   return {
     id: r.id,
     time: r.logDate ? new Date(r.logDate).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "--:--",
@@ -39,14 +38,14 @@ export default function ManagerDashboardPage() {
   const user   = useCurrentUser();
   const router = useRouter();
 
-  const [tasks,   setTasks]   = useState<Task[]>([]);
-  const [logs,    setLogs]    = useState<LogEntry[]>([]);
+  const [tasks,   setTasks]   = useState([]);
+  const [logs,    setLogs]    = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      api.get<{ tasks: any[] }>("/tasks"),
-      api.get<{ logs:  any[] }>("/logs"),
+      api.get("/tasks"),
+      api.get("/logs"),
     ])
       .then(([t, l]) => {
         setTasks(t.tasks.map(mapTask));
@@ -57,7 +56,7 @@ export default function ManagerDashboardPage() {
   }, []);
 
   // Managers can still change task status
-  async function handleStatusChange(taskId: string, newStatus: TaskStatus) {
+  async function handleStatusChange(taskId, newStatus) {
     const prev = tasks.find((t) => t.id === taskId)?.status;
     setTasks((all) => all.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
     try {

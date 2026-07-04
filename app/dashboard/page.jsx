@@ -8,12 +8,11 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
-import type { Task, LogEntry } from "@/types";
 import { useRouter } from "next/navigation";
 
-function mapTask(r: any): Task {
+function mapTask(r) {
   const initials = r.author?.name
-    ? r.author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
+    ? r.author.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
     : "IT";
   return {
     id: r.id, title: r.title, description: r.description ?? undefined,
@@ -24,7 +23,7 @@ function mapTask(r: any): Task {
   };
 }
 
-function mapLog(r: any): LogEntry {
+function mapLog(r) {
   return {
     id: r.id,
     time: r.logDate ? new Date(r.logDate).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "--:--",
@@ -42,7 +41,7 @@ function getGreeting() {
 }
 
 // ── Empty state component ────────────────────────────────────────────────────
-function EmptyState({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+function EmptyState({ icon, title, sub }) {
   return (
     <div className="flex flex-col items-center justify-center py-8 text-center bg-surf border border-dashed border-border rounded-[10px]">
       <span className="text-2xl mb-2">{icon}</span>
@@ -56,14 +55,14 @@ export default function DashboardPage() {
   const user = useCurrentUser();
   const router = useRouter();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [tasks, setTasks] = useState([]);
+  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      api.get<{ tasks: any[] }>("/tasks"),
-      api.get<{ logs: any[] }>("/logs"),
+      api.get("/tasks"),
+      api.get("/logs"),
     ])
       .then(([taskRes, logRes]) => {
         setTasks(taskRes.tasks.map(mapTask));
