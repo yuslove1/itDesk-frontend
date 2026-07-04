@@ -1,3 +1,3 @@
-export default function ReportLayout({ children }: { children: React.ReactNode }) {
+export default function ReportLayout({ children }) {
   return <div className="min-h-screen bg-paper">{children}</div>;
 }

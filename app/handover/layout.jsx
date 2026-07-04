@@ -1,3 +1,3 @@
-export default function HandoverLayout({ children }: { children: React.ReactNode }) {
+export default function HandoverLayout({ children }) {
   return <div className="h-screen overflow-hidden bg-paper flex flex-col">{children}</div>;
 }

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -17,12 +16,12 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "IT Desk — UAC Foods Dairies Plant",
   description: "Task & activity management system for the IT department at UAC Foods Dairies Plant.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${jakarta.variable} ${jetbrains.variable}`}>
       <body className="antialiased h-full">{children}</body>
