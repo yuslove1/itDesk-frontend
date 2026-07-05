@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, isValidEmail, minLength, sanitizeInput } from "@/lib/validators";
 
 function EyeIcon() {
   return (
@@ -41,12 +42,19 @@ export default function SignupPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
-    if (password !== confirm) { setError("Passwords do not match"); return; }
-    if (password.length < 8)  { setError("Password must be at least 8 characters"); return; }
+
+    const cleanName  = sanitizeInput(name);
+    const cleanEmail = sanitizeInput(email);
+
+    if (!isRequired(cleanName))            { setError("Full name is required"); return; }
+    if (!isValidEmail(cleanEmail))          { setError("Enter a valid email address"); return; }
+    if (!minLength(password, 8))            { setError("Password must be at least 8 characters"); return; }
+    if (password !== confirm)               { setError("Passwords do not match"); return; }
+
     setLoading(true);
     try {
-      await api.post("/auth/register", { name: name.trim(), email: email.trim(), password, role });
-      router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
+      await api.post("/auth/register", { name: cleanName, email: cleanEmail, password, role });
+      router.push(`/verify-otp?email=${encodeURIComponent(cleanEmail)}`);
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, isValidEmail, sanitizeInput } from "@/lib/validators";
 
 const features = [
   "Daily activity log",
@@ -29,11 +30,22 @@ function LoginContent() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
+    const cleanEmail = sanitizeInput(email);
+    if (!isRequired(cleanEmail) || !isValidEmail(cleanEmail)) {
+      setError("Enter a valid email address");
+      return;
+    }
+    if (!isRequired(password)) {
+      setError("Password is required");
+      return;
+    }
+
     setLoading(true);
     try {
       // The session cookie is set automatically via this response's Set-Cookie
       // header — there's nothing left to store client-side afterward.
-      const data = await api.post("/auth/login", { email, password });
+      const data = await api.post("/auth/login", { email: cleanEmail, password });
       router.push(data.user.role === "manager" ? "/manager" : "/dashboard");
     } catch (err) {
       if (err.response?.data?.requiresVerification) {
