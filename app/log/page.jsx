@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { isRequired, sanitizeInput } from "@/lib/validators";
+import { getSocket } from "@/lib/socket";
 
 const categories = ["routine", "hardware", "network", "software", "setup"];
 
@@ -40,6 +41,35 @@ export default function LogPage() {
       .then((res) => setEntries(res.logs.map(mapLog)))
       .catch(console.error)
       .finally(() => setLoading(false));
+  }, []);
+
+  // ── Live updates from other connected clients — same dedupe reasoning as
+  // app/tasks/page.jsx: "created" needs a guard against the echo of this
+  // client's own optimistic add, "updated"/"deleted" don't. ─────────────────
+  useEffect(() => {
+    const socket = getSocket();
+
+    function handleCreated(log) {
+      setEntries((prev) => (
+        prev.some((e) => e.id === log.id) ? prev : [mapLog(log), ...prev]
+      ));
+    }
+    function handleUpdated(log) {
+      setEntries((prev) => prev.map((e) => (e.id === log.id ? mapLog(log) : e)));
+    }
+    function handleDeleted({ id }) {
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+    }
+
+    socket.on("log:created", handleCreated);
+    socket.on("log:updated", handleUpdated);
+    socket.on("log:deleted", handleDeleted);
+
+    return () => {
+      socket.off("log:created", handleCreated);
+      socket.off("log:updated", handleUpdated);
+      socket.off("log:deleted", handleDeleted);
+    };
   }, []);
 
   async function handleSubmit(e) {

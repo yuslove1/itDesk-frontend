@@ -8,6 +8,7 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { isRequired, sanitizeInput } from "@/lib/validators";
+import { getSocket } from "@/lib/socket";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
 function mapTask(r) {
@@ -263,6 +264,46 @@ export default function TasksPage() {
       .then((res) => setTasks(res.tasks.map(mapTask)))
       .catch(console.error)
       .finally(() => setLoading(false));
+  }, []);
+
+  // ── Live updates from other connected clients (see itDesk_api/index.js for
+  // where these events are emitted) ──────────────────────────────────────────
+  // WHY DEDUPE ON "created" BUT NOT ON "updated"/"deleted"?
+  // The server broadcasts to every connected client, including whoever made
+  // the request in the first place. On create, THIS client already added the
+  // task locally via AddTaskForm's onCreated callback (an optimistic update,
+  // so the UI feels instant) — the socket event for that same task arrives a
+  // moment later and would duplicate it if just prepended blindly. Update and
+  // delete are naturally idempotent (mapping/filtering by id is a no-op if
+  // the id isn't there, and harmless if it already reflects the new state),
+  // so they don't need the same guard.
+  useEffect(() => {
+    const socket = getSocket();
+
+    function handleCreated(task) {
+      setTasks((prev) => (
+        prev.some((t) => t.id === task.id) ? prev : [mapTask(task), ...prev]
+      ));
+    }
+    function handleUpdated(task) {
+      setTasks((prev) => prev.map((t) => (t.id === task.id ? mapTask(task) : t)));
+    }
+    function handleDeleted({ id }) {
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+    }
+
+    socket.on("task:created", handleCreated);
+    socket.on("task:updated", handleUpdated);
+    socket.on("task:deleted", handleDeleted);
+
+    // Remove these specific listeners on unmount — leaving them attached
+    // would mean navigating away and back stacks up duplicate handlers, each
+    // firing on every future event.
+    return () => {
+      socket.off("task:created", handleCreated);
+      socket.off("task:updated", handleUpdated);
+      socket.off("task:deleted", handleDeleted);
+    };
   }, []);
 
   // ── Optimistic status move ─────────────────────────────────────────────────
