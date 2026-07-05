@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, sanitizeInput } from "@/lib/validators";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
 function mapAsset(r) {
@@ -69,6 +70,31 @@ function FilterPill({ label, active, onClick }) {
 
 const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
 const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
+
+// ── Shared validation for the Add/Edit asset forms ─────────────────────────────
+// name/location/department are the only required fields (matches the backend's
+// own required-field check in itDesk_api/src/routes/assets.js) — everything
+// else is optional. Returns an error message, or null if the form is valid.
+function validateAssetForm(form) {
+  if (!isRequired(form.name))       return "Asset name is required";
+  if (!isRequired(form.location))   return "Location is required";
+  if (!isRequired(form.department)) return "Department is required";
+  return null;
+}
+
+// Trims every free-text field before it goes to the API. Fields left blank on
+// purpose (serialNumber, notes) stay blank rather than becoming "undefined" —
+// that conversion already happens where each form builds its payload.
+function sanitizeAssetForm(form) {
+  return {
+    ...form,
+    name:         sanitizeInput(form.name),
+    serialNumber: sanitizeInput(form.serialNumber),
+    location:     sanitizeInput(form.location),
+    department:   sanitizeInput(form.department),
+    notes:        sanitizeInput(form.notes),
+  };
+}
 
 // ── Shared asset form fields ───────────────────────────────────────────────────
 function AssetFormFields({ form, set }) {
@@ -145,9 +171,17 @@ function AddAssetForm({ onClose, onCreated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
+    const validationError = validateAssetForm(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setSaving(true);
     try {
-      const payload = { ...form, type: form.type === "switch" ? "switch_device" : form.type };
+      const clean   = sanitizeAssetForm(form);
+      const payload = { ...clean, type: clean.type === "switch" ? "switch_device" : clean.type };
       const res = await api.post("/assets", payload);
       onCreated(mapAsset(res.asset));
       onClose();
@@ -198,14 +232,22 @@ function EditAssetModal({ asset, onClose, onUpdated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
+    const validationError = validateAssetForm(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setSaving(true);
     try {
+      const clean = sanitizeAssetForm(form);
       const payload = {
-        ...form,
-        type: form.type === "switch" ? "switch_device" : form.type,
-        serialNumber:   form.serialNumber   || undefined,
-        warrantyExpiry: form.warrantyExpiry || undefined,
-        notes:          form.notes          || undefined,
+        ...clean,
+        type: clean.type === "switch" ? "switch_device" : clean.type,
+        serialNumber:   clean.serialNumber   || undefined,
+        warrantyExpiry: clean.warrantyExpiry || undefined,
+        notes:          clean.notes          || undefined,
       };
       const res = await api.patch(`/assets/${asset.id}`, payload);
       onUpdated(mapAsset(res.asset));
