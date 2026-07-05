@@ -6,6 +6,7 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
+import { isRequired, sanitizeInput } from "@/lib/validators";
 
 const categories = ["routine", "hardware", "network", "software", "setup"];
 
@@ -43,12 +44,18 @@ export default function LogPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!description.trim()) return;
     setError(null);
+
+    const cleanDescription = sanitizeInput(description);
+    if (!isRequired(cleanDescription)) {
+      setError("Activity description is required");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await api.post("/logs", {
-        content: description.trim(),
+        content: cleanDescription,
         category,
       });
       // Prepend the new entry to the list
@@ -72,9 +79,12 @@ export default function LogPage() {
   }
 
   // ── Edit a log entry (admin/manager only) ─────────────────────────────────
+  // Note: LogEntryCard already blocks calling this with empty content, so this
+  // just sanitizes rather than re-validating a case the UI already prevents.
   async function handleEditLog(id, content, category) {
+    const cleanContent = sanitizeInput(content);
     try {
-      const res = await api.patch(`/logs/${id}`, { content, category });
+      const res = await api.patch(`/logs/${id}`, { content: cleanContent, category });
       setEntries((prev) =>
         prev.map((e) => e.id === id ? mapLog(res.log) : e),
       );

@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { HandoverCard } from "@/components/ui/HandoverCard";
-import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, sanitizeInput } from "@/lib/validators";
 
 function mapNote(r) {
   return {
@@ -33,13 +33,20 @@ function EditNoteModal({ note, onClose, onUpdated }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
     setError(null);
+
+    const cleanTitle   = sanitizeInput(title);
+    const cleanContent = sanitizeInput(content);
+    if (!isRequired(cleanTitle) || !isRequired(cleanContent)) {
+      setError("Title and content are both required");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await api.patch(`/handover/${note.id}`, {
-        title: title.trim(),
-        content: content.trim(),
+        title: cleanTitle,
+        content: cleanContent,
       });
       onUpdated(mapNote(res.note));
       onClose();
@@ -120,13 +127,20 @@ export default function HandoverPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
     setError(null);
+
+    const cleanTitle   = sanitizeInput(title);
+    const cleanContent = sanitizeInput(content);
+    if (!isRequired(cleanTitle) || !isRequired(cleanContent)) {
+      setError("Title and content are both required");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await api.post("/handover", {
-        title: title.trim(),
-        content: content.trim(),
+        title: cleanTitle,
+        content: cleanContent,
       });
       setNotes((prev) => [mapNote(res.note), ...prev]);
       setTitle("");
@@ -159,10 +173,6 @@ export default function HandoverPage() {
           // Context for the next IT person · {notes.length} active notes
           {canManage && <span className="ml-2 text-uac-green">· hover a note to edit or delete</span>}
         </p>
-
-        {/* <Alert variant="amber">
-          ⚠&nbsp; 1 month left in service — ensure all handover notes are complete before departure.
-        </Alert> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
           {/* Active notes */}
