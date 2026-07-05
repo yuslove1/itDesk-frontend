@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, sanitizeInput } from "@/lib/validators";
 
 // StaffUser shape: { id: string, name: string, email: string, role: string }
 
@@ -76,13 +77,19 @@ export default function CreateTaskPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim()) return;
     setError(null);
+
+    const cleanTitle = sanitizeInput(title);
+    if (!isRequired(cleanTitle)) {
+      setError("Task title is required");
+      return;
+    }
+
     setSaving(true);
     try {
       await api.post("/tasks", {
-        title: title.trim(),
-        description: description.trim() || undefined,
+        title: cleanTitle,
+        description: sanitizeInput(description) || undefined,
         category,
         priority,
         status: "todo",

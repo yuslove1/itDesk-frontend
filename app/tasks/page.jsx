@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { isRequired, sanitizeInput } from "@/lib/validators";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
 function mapTask(r) {
@@ -56,13 +57,19 @@ function AddTaskForm({ onClose, onCreated }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim()) return;
     setError(null);
+
+    const cleanTitle = sanitizeInput(title);
+    if (!isRequired(cleanTitle)) {
+      setError("Title is required");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await api.post("/tasks", {
-        title: title.trim(),
-        description: description.trim() || undefined,
+        title: cleanTitle,
+        description: sanitizeInput(description) || undefined,
         category,
         priority,
         status: "todo",
@@ -152,13 +159,19 @@ function EditTaskForm({ task, onClose, onUpdated }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!title.trim()) return;
     setError(null);
+
+    const cleanTitle = sanitizeInput(title);
+    if (!isRequired(cleanTitle)) {
+      setError("Title is required");
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await api.patch(`/tasks/${task.id}`, {
-        title: title.trim(),
-        description: description.trim() || undefined,
+        title: cleanTitle,
+        description: sanitizeInput(description) || undefined,
         category,
         priority,
       });
