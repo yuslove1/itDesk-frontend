@@ -61,7 +61,7 @@ types/index.js            JSDoc type definitions for the app's core domain shape
                          not enforced at build time (this is a plain JS project)
 ```
 
-**Backend** (Express + Prisma + PostgreSQL): [github.com/yuslove1/Dairies_IT_Desk](https://github.com/yuslove1/Dairies_IT_Desk), `itDesk_api/` directory, `lancer-assessment` branch. Routes: `auth`, `tasks`, `logs`, `handover`, `assets`, `reports`, `users`.
+**Backend** (Express + Prisma + PostgreSQL): [github.com/yuslove1/Dairies_IT_Desk](https://github.com/yuslove1/Dairies_IT_Desk), `itDesk_api/` directory. Routes: `auth`, `tasks`, `logs`, `handover`, `assets`, `reports`, `users`.
 
 ## Original Functionality
 
@@ -98,9 +98,10 @@ Both are live and confirmed working together in production — login/logout, `GE
 
 **Prerequisites**: Node 20+, a PostgreSQL database (see backend README for setup + `npx prisma migrate dev`).
 
-**1. Run the backend** (see backend repo for full instructions):
+**1. Run the backend** (separate repo — see [github.com/yuslove1/Dairies_IT_Desk](https://github.com/yuslove1/Dairies_IT_Desk)'s `itDesk_api/` for full instructions):
 ```bash
-cd itDesk_api
+git clone git@github.com:yuslove1/Dairies_IT_Desk.git
+cd Dairies_IT_Desk/itDesk_api
 npm install
 npm run dev   # http://localhost:4000
 ```
