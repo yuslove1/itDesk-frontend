@@ -88,9 +88,11 @@ Added/changed for this assessment, matching the concepts covered in the technica
 
 ## Live Application URL
 
-**Backend API**: [https://itdesk-api-final.onrender.com](https://itdesk-api-final.onrender.com) — live, running session auth + socket.io. Verified in production: login/logout, `GET /auth/me`, and a real socket.io connection all work correctly, including the `Secure`/`httpOnly` session cookie (`api/health` → `{ ok: true }`).
+**App**: [https://it-desk-frontend.vercel.app](https://it-desk-frontend.vercel.app)
 
-**Frontend**: not yet deployed — Vercel deploy pending. Once it's live, `CLIENT_URL` on the backend needs the frontend's Vercel origin added (see `itDesk_api/.env.example` — it accepts a comma-separated list, so this can sit alongside any other origin already configured there) for CORS to allow the browser to actually use the API cross-origin.
+**Backend API**: [https://itdesk-api-final.onrender.com](https://itdesk-api-final.onrender.com)
+
+Both are live and confirmed working together in production — login/logout, `GET /auth/me`, and a real socket.io connection all verified end-to-end against the actual deployed frontend's origin, not just localhost, including the cross-origin `Secure`/`httpOnly` session cookie and CORS accepting the real Vercel domain.
 
 ## Testing Guide
 
