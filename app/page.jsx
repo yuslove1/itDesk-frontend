@@ -80,7 +80,7 @@ function LoginContent() {
             <strong className="font-bold">tracked &amp; handed over.</strong>
           </p>
           <p className="font-mono text-[10px] text-white/25 mt-3">
-            // UAC Foods Dairies Plant · IT Dept
+            {"// "}UAC Foods Dairies Plant · IT Dept
           </p>
         </div>
 

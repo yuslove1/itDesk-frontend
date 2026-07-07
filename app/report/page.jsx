@@ -33,7 +33,7 @@ export default function GenerateReportPage() {
         Generate Snapshot Report
       </h1>
       <p className="font-mono text-[10px] text-ink5 mb-5">
-        // Creates a shareable link — valid for 24 hours · send to manager via WhatsApp
+        {"// "}Creates a shareable link — valid for 24 hours · send to manager via WhatsApp
       </p>
 
       {/* Info card */}

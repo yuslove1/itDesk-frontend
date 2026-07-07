@@ -108,7 +108,7 @@ export default function CreateTaskPage() {
         Create &amp; Assign Task
       </h1>
       <p className="font-mono text-[10px] text-ink5 mb-4">
-        // Manager action · task appears on staff board immediately with the purple &ldquo;assigned by manager&rdquo; label
+        {"// "}Manager action · task appears on staff board immediately with the purple &ldquo;assigned by manager&rdquo; label
       </p>
 
       <Alert variant="green">

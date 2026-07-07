@@ -76,7 +76,7 @@ export default function SignupPage() {
           <p className="text-[26px] sm:text-[30px] font-light text-white leading-snug tracking-tight mt-8">
             Create your<br /><strong className="font-bold">IT Desk account.</strong>
           </p>
-          <p className="font-mono text-[10px] text-white/25 mt-3">// UAC Foods Dairies Plant · IT Dept</p>
+          <p className="font-mono text-[10px] text-white/25 mt-3">{"// "}UAC Foods Dairies Plant · IT Dept</p>
         </div>
         <ul className="hidden sm:flex flex-col gap-2">
           {["Daily activity log","Kanban task board","Manager assign tasks","Handover notes","Shareable reports","Asset register"].map((f) => (

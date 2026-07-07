@@ -170,7 +170,7 @@ export default function HandoverPage() {
       <AppShell user={user} subtitle="Handover Notes">
         <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">Handover Notes</h1>
         <p className="font-mono text-[10px] text-ink5 mb-4">
-          // Context for the next IT person · {notes.length} active notes
+          {"// "}Context for the next IT person · {notes.length} active notes
           {canManage && <span className="ml-2 text-uac-green">· hover a note to edit or delete</span>}
         </p>
 

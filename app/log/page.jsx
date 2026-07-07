@@ -128,7 +128,7 @@ export default function LogPage() {
     <AppShell user={user} subtitle="Daily Log">
       <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">Daily Log</h1>
       <p className="font-mono text-[10px] text-ink5 mb-4 sm:mb-5">
-        // {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {entries.length} entries logged today
+        {"// "}{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {entries.length} entries logged today
         {canManage && <span className="ml-2 text-uac-green">· hover an entry to edit or delete</span>}
       </p>
 

@@ -92,7 +92,7 @@ export default function ManagerDashboardPage() {
         <div className="min-w-0">
           <p className="text-[14px] font-bold text-white">Manager Dashboard</p>
           <p className="font-mono text-[9px] text-white/35 mt-0.5 truncate">
-            // {today} · Dairies Plant IT Support · Read + Create tasks
+            {"// "}{today} · Dairies Plant IT Support · Read + Create tasks
           </p>
         </div>
         <span className="ml-auto font-mono text-[9px] font-semibold px-2 py-1 rounded bg-uac-green/25 text-uac-green-mid border border-uac-green/40 uppercase tracking-wide shrink-0 hidden sm:inline">

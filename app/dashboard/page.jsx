@@ -92,7 +92,7 @@ export default function DashboardPage() {
             {getGreeting()}, {user?.name ?? "…"} ☀
           </h1>
           <p className="font-mono text-[10px] text-ink5 mt-0.5">
-            // {today} · Dairies Plant IT Support
+            {"// "}{today} · Dairies Plant IT Support
           </p>
         </div>
         <div className="hidden sm:flex flex-col items-end gap-1">

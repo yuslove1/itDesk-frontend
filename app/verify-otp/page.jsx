@@ -116,7 +116,7 @@ function VerifyOtpContent() {
           <p className="text-[26px] sm:text-[30px] font-light text-white leading-snug tracking-tight mt-8">
             One step<br /><strong className="font-bold">left to go.</strong>
           </p>
-          <p className="font-mono text-[10px] text-white/25 mt-3">// UAC Foods Dairies Plant · IT Dept</p>
+          <p className="font-mono text-[10px] text-white/25 mt-3">{"// "}UAC Foods Dairies Plant · IT Dept</p>
         </div>
         <div className="hidden sm:block bg-white/5 border border-white/10 rounded-[10px] p-4">
           <p className="font-mono text-[9px] text-white/40 uppercase tracking-widest mb-2">Why verify?</p>

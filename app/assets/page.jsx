@@ -336,7 +336,7 @@ export default function AssetsPage() {
           <div>
             <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink">Asset Register</h1>
             <p className="font-mono text-[10px] text-ink5 mt-0.5">
-              // {loading ? "…" : assets.length} devices tracked · Dairies Plant IT Dept
+              {"// "}{loading ? "…" : assets.length} devices tracked · Dairies Plant IT Dept
             </p>
           </div>
           {user?.role !== "manager" && (
