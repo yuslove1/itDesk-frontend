@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui/StatCard";
+import { TaskCompositionBar } from "@/components/ui/TaskCompositionBar";
 import { TaskCard } from "@/components/ui/TaskCard";
 import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
@@ -134,6 +135,11 @@ export default function DashboardPage() {
           detail="today"
         />
       </div>
+
+      {/* ── Task composition ────────────────────────────────────────────────── */}
+      {!loading && (
+        <TaskCompositionBar todo={todo.length} wip={wip.length} done={done.length} />
+      )}
 
       {/* ── Two-col widget area ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 animate-fade-up">

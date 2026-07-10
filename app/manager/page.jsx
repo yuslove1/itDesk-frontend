@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui/StatCard";
+import { TaskCompositionBar } from "@/components/ui/TaskCompositionBar";
 import { TaskCard } from "@/components/ui/TaskCard";
 import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
@@ -109,6 +110,11 @@ export default function ManagerDashboardPage() {
         <StatCard icon={CheckCircle2}  label="Done today"   value={loading ? "…" : done.length}  variant="green" detail={done.length > 0 ? "completed" : "get started"} />
         <StatCard icon={FileText}      label="Log entries"  value={loading ? "…" : logs.length}  detail="today" />
       </div>
+
+      {/* ── Task composition ────────────────────────────────────────────────── */}
+      {!loading && (
+        <TaskCompositionBar todo={todo.length} wip={wip.length} done={done.length} />
+      )}
 
       {/* Two-col */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 animate-fade-up">
