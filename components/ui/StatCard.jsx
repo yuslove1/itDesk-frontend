@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Sparkline } from "./Sparkline";
 
 const variants = {
   default: {
@@ -7,6 +8,7 @@ const variants = {
     value:  "text-ink",
     detail: "text-ink5",
     dot:    "bg-ink6",
+    trend:  "text-ink4",
   },
   red: {
     wrap:   "bg-uac-red-soft border-border",
@@ -14,6 +16,7 @@ const variants = {
     value:  "text-uac-red",
     detail: "text-uac-red",
     dot:    "bg-uac-red-mid",
+    trend:  "text-uac-red",
   },
   green: {
     wrap:   "bg-uac-green-soft border-border",
@@ -21,6 +24,7 @@ const variants = {
     value:  "text-uac-green-dk",
     detail: "text-uac-green-dk",
     dot:    "bg-uac-green-mid",
+    trend:  "text-uac-green",
   },
   amber: {
     wrap:   "bg-amber-soft border-border",
@@ -28,11 +32,16 @@ const variants = {
     value:  "text-amber",
     detail: "text-amber",
     dot:    "bg-amber",
+    trend:  "text-amber",
   },
 };
 
-/** `icon` is a lucide-react component reference (e.g. `ClipboardList`), not an element. */
-export function StatCard({ label, value, detail, icon: Icon, variant = "default" }) {
+/**
+ * `icon` is a lucide-react component reference (e.g. `ClipboardList`), not an element.
+ * `trend`, if passed, is an array of daily counts (oldest → newest) rendered as a
+ * sparkline — the last point is drawn in the tile's accent color.
+ */
+export function StatCard({ label, value, detail, icon: Icon, trend, variant = "default" }) {
   const v = variants[variant];
   return (
     <div className={cn("rounded-[10px] border relative overflow-hidden card-lift", v.wrap)}>
@@ -57,17 +66,27 @@ export function StatCard({ label, value, detail, icon: Icon, variant = "default"
           </span>
         </div>
 
-        {/* Value */}
-        <div className={cn("text-[30px] font-extrabold tracking-tight leading-none", v.value)}>
-          {value}
-        </div>
+        <div className="flex items-end justify-between gap-2">
+          <div>
+            {/* Value */}
+            <div className={cn("text-[30px] font-extrabold tracking-tight leading-none", v.value)}>
+              {value}
+            </div>
 
-        {/* Detail */}
-        {detail && (
-          <div className={cn("text-[10px] mt-1.5 font-medium", v.detail)}>
-            {detail}
+            {/* Detail */}
+            {detail && (
+              <div className={cn("text-[10px] mt-1.5 font-medium", v.detail)}>
+                {detail}
+              </div>
+            )}
           </div>
-        )}
+
+          {trend && (
+            <div title="Last 7 days">
+              <Sparkline data={trend} accentClassName={v.trend} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

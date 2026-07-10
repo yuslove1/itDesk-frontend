@@ -10,6 +10,7 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
+import { bucketByDay } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ClipboardList, Timer, CheckCircle2, FileText, KanbanSquare, NotebookPen, ArrowRight, Plus } from "lucide-react";
 
@@ -23,7 +24,27 @@ function mapTask(r) {
     assignedTo: { id: r.author?.id ?? "unknown", name: r.author?.name ?? "IT Staff", initials, role: r.author?.role ?? "staff", department: "IT Dept" },
     isManagerAssigned: r.author?.role === "manager",
     createdAt: r.createdAt ? new Date(r.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "--:--",
+    // Raw timestamps (kept separately from the formatted `createdAt` above,
+    // which the TaskCard corner display depends on) — used to bucket the
+    // dashboard's stat-tile sparklines into real daily counts.
+    createdAtRaw: r.createdAt,
+    updatedAtRaw: r.updatedAt,
   };
+}
+
+// Last 7 days of log counts — the /logs endpoint only ever returns one day
+// at a time (today, or a ?date= you pass), so a real trend needs one small
+// request per day rather than a single fetch.
+async function fetchLogTrend(days = 7) {
+  const dates = Array.from({ length: days }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (days - 1 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  const results = await Promise.all(
+    dates.map((date) => api.get(`/logs?date=${date}`).catch(() => ({ logs: [] }))),
+  );
+  return results.map((r) => r.logs.length);
 }
 
 function mapLog(r) {
@@ -60,6 +81,7 @@ export default function DashboardPage() {
 
   const [tasks, setTasks] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [logTrend, setLogTrend] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,12 +95,22 @@ export default function DashboardPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    fetchLogTrend().then(setLogTrend).catch(() => setLogTrend(null));
   }, []);
 
   const todo = tasks.filter((t) => t.status === "todo");
   const wip = tasks.filter((t) => t.status === "wip");
   const done = tasks.filter((t) => t.status === "done");
   const active = tasks.filter((t) => t.status !== "done").slice(0, 3);
+
+  // Real 7-day sparklines derived from data already on the page — no
+  // fabricated trend. Open = tasks created/day; In progress & Done use
+  // updatedAt as the best available proxy for "recently active" (the API
+  // doesn't track status-change history separately from updatedAt).
+  const openTrend = bucketByDay(tasks, (t) => t.createdAtRaw);
+  const wipTrend   = bucketByDay(wip,  (t) => t.updatedAtRaw);
+  const doneTrend  = bucketByDay(done, (t) => t.updatedAtRaw);
 
   const today = new Date().toLocaleDateString("en-GB", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
@@ -115,24 +147,28 @@ export default function DashboardPage() {
           icon={ClipboardList} label="Open tasks"
           value={loading ? "…" : todo.length}
           detail={loading ? undefined : todo.length > 0 ? `${todo.length} need attention` : "All clear"}
+          trend={loading ? undefined : openTrend}
           variant="red"
         />
         <StatCard
           icon={Timer} label="In progress"
           value={loading ? "…" : wip.length}
           detail={loading ? undefined : wip.length > 0 ? "Active now" : "None active"}
+          trend={loading ? undefined : wipTrend}
           variant="amber"
         />
         <StatCard
           icon={CheckCircle2} label="Done today"
           value={loading ? "…" : done.length}
           detail={loading ? undefined : done.length > 0 ? "Good pace" : "Get started"}
+          trend={loading ? undefined : doneTrend}
           variant="green"
         />
         <StatCard
           icon={FileText} label="Log entries"
           value={loading ? "…" : logs.length}
           detail="today"
+          trend={logTrend}
         />
       </div>
 

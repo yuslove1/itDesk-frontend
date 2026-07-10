@@ -11,6 +11,7 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
+import { bucketByDay } from "@/lib/utils";
 import { ClipboardList, Timer, CheckCircle2, FileText, KanbanSquare, NotebookPen, ClipboardPlus } from "lucide-react";
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -24,7 +25,24 @@ function mapTask(r) {
     assignedTo: { id: r.author?.id ?? "?", name: r.author?.name ?? "IT Staff", initials, role: r.author?.role ?? "staff", department: "IT Dept" },
     isManagerAssigned: r.author?.role === "manager",
     createdAt: r.createdAt ? new Date(r.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "--:--",
+    // Raw timestamps for the stat-tile sparklines — see dashboard/page.jsx's
+    // mapTask for why these are kept separate from the formatted `createdAt`.
+    createdAtRaw: r.createdAt,
+    updatedAtRaw: r.updatedAt,
   };
+}
+
+// Last 7 days of log counts — /logs only ever returns one day at a time.
+async function fetchLogTrend(days = 7) {
+  const dates = Array.from({ length: days }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (days - 1 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  const results = await Promise.all(
+    dates.map((date) => api.get(`/logs?date=${date}`).catch(() => ({ logs: [] }))),
+  );
+  return results.map((r) => r.logs.length);
 }
 
 function mapLog(r) {
@@ -41,9 +59,10 @@ export default function ManagerDashboardPage() {
   const user   = useCurrentUser();
   const router = useRouter();
 
-  const [tasks,   setTasks]   = useState([]);
-  const [logs,    setLogs]    = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [tasks,    setTasks]    = useState([]);
+  const [logs,     setLogs]     = useState([]);
+  const [logTrend, setLogTrend] = useState(null);
+  const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
     Promise.all([
@@ -56,6 +75,8 @@ export default function ManagerDashboardPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    fetchLogTrend().then(setLogTrend).catch(() => setLogTrend(null));
   }, []);
 
   // Managers can still change task status
@@ -73,6 +94,11 @@ export default function ManagerDashboardPage() {
   const wip     = tasks.filter((t) => t.status === "wip");
   const done    = tasks.filter((t) => t.status === "done");
   const openAll = tasks.filter((t) => t.status !== "done");
+
+  // Real 7-day sparklines — see dashboard/page.jsx for the same derivation.
+  const openTrend = bucketByDay(tasks, (t) => t.createdAtRaw);
+  const wipTrend  = bucketByDay(wip,  (t) => t.updatedAtRaw);
+  const doneTrend = bucketByDay(done, (t) => t.updatedAtRaw);
 
   const today = new Date().toLocaleDateString("en-GB", {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
@@ -105,10 +131,10 @@ export default function ManagerDashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-4 sm:mb-5 animate-fade-up">
-        <StatCard icon={ClipboardList} label="Open tasks"   value={loading ? "…" : todo.length}  variant="red"   detail={todo.length > 0 ? "need attention" : "all clear"} />
-        <StatCard icon={Timer}         label="In progress"  value={loading ? "…" : wip.length}   variant="amber" detail={wip.length > 0 ? "active now" : "none active"} />
-        <StatCard icon={CheckCircle2}  label="Done today"   value={loading ? "…" : done.length}  variant="green" detail={done.length > 0 ? "completed" : "get started"} />
-        <StatCard icon={FileText}      label="Log entries"  value={loading ? "…" : logs.length}  detail="today" />
+        <StatCard icon={ClipboardList} label="Open tasks"   value={loading ? "…" : todo.length}  variant="red"   detail={todo.length > 0 ? "need attention" : "all clear"} trend={loading ? undefined : openTrend} />
+        <StatCard icon={Timer}         label="In progress"  value={loading ? "…" : wip.length}   variant="amber" detail={wip.length > 0 ? "active now" : "none active"} trend={loading ? undefined : wipTrend} />
+        <StatCard icon={CheckCircle2}  label="Done today"   value={loading ? "…" : done.length}  variant="green" detail={done.length > 0 ? "completed" : "get started"} trend={loading ? undefined : doneTrend} />
+        <StatCard icon={FileText}      label="Log entries"  value={loading ? "…" : logs.length}  detail="today" trend={logTrend} />
       </div>
 
       {/* ── Task composition ────────────────────────────────────────────────── */}
