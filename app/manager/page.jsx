@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui/StatCard";
@@ -9,6 +10,7 @@ import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
+import { ClipboardList, Timer, CheckCircle2, FileText, KanbanSquare, NotebookPen, ClipboardPlus } from "lucide-react";
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
 function mapTask(r) {
@@ -80,32 +82,32 @@ export default function ManagerDashboardPage() {
       user={user}
       subtitle="Manager View"
       topbarActions={
-        <Button variant="soft-green" size="sm" onClick={() => router.push("/manager/create-task")}>
-          + Create &amp; Assign Task
+        <Button variant="soft-green" size="sm" icon={ClipboardPlus} onClick={() => router.push("/manager/create-task")}>
+          Create &amp; Assign Task
         </Button>
       }
     >
       {/* Manager banner */}
       <div className="rounded-[10px] bg-gradient-to-br from-uac-red-deep to-[#3a0818] border border-uac-red/30 px-5 py-4 flex items-center gap-3.5 mb-4 animate-fade-up relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "12px 12px" }} />
-        <span className="text-xl sm:text-2xl shrink-0">📋</span>
+        <Image src="/icons/3d/clipboard_3d.png" alt="" width={36} height={36} className="shrink-0" />
         <div className="min-w-0">
           <p className="text-[14px] font-bold text-white">Manager Dashboard</p>
-          <p className="font-mono text-[9px] text-white/35 mt-0.5 truncate">
-            {"// "}{today} · Dairies Plant IT Support · Read + Create tasks
+          <p className="text-[11px] text-white/40 mt-0.5 truncate">
+            {today} · Dairies Plant IT Support · Read + Create tasks
           </p>
         </div>
-        <span className="ml-auto font-mono text-[9px] font-semibold px-2 py-1 rounded bg-uac-green/25 text-uac-green-mid border border-uac-green/40 uppercase tracking-wide shrink-0 hidden sm:inline">
+        <span className="ml-auto text-[10px] font-semibold px-2 py-1 rounded bg-uac-green/25 text-uac-green-mid border border-uac-green/40 uppercase tracking-wide shrink-0 hidden sm:inline">
           Manager view
         </span>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-4 sm:mb-5 animate-fade-up">
-        <StatCard icon="📋" label="Open tasks"   value={loading ? "…" : todo.length}  variant="red"   detail={todo.length > 0 ? "need attention" : "all clear ✓"} />
-        <StatCard icon="⚙"  label="In progress"  value={loading ? "…" : wip.length}   variant="amber" detail={wip.length > 0 ? "active now" : "none active"} />
-        <StatCard icon="✓"  label="Done today"   value={loading ? "…" : done.length}  variant="green" detail={done.length > 0 ? "completed" : "get started"} />
-        <StatCard icon="📝" label="Log entries"  value={loading ? "…" : logs.length}  detail="today" />
+        <StatCard icon={ClipboardList} label="Open tasks"   value={loading ? "…" : todo.length}  variant="red"   detail={todo.length > 0 ? "need attention" : "all clear"} />
+        <StatCard icon={Timer}         label="In progress"  value={loading ? "…" : wip.length}   variant="amber" detail={wip.length > 0 ? "active now" : "none active"} />
+        <StatCard icon={CheckCircle2}  label="Done today"   value={loading ? "…" : done.length}  variant="green" detail={done.length > 0 ? "completed" : "get started"} />
+        <StatCard icon={FileText}      label="Log entries"  value={loading ? "…" : logs.length}  detail="today" />
       </div>
 
       {/* Two-col */}
@@ -113,12 +115,12 @@ export default function ManagerDashboardPage() {
         {/* All open tasks */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-[12px] font-bold text-ink flex items-center gap-1.5">
-              <span className="text-uac-red text-[10px]">◫</span>
-              All tasks <span className="font-mono text-[9px] font-normal text-ink5 ml-1">({openAll.length} open)</span>
+            <h2 className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+              <KanbanSquare size={13} strokeWidth={2.25} className="text-uac-red" />
+              All tasks <span className="text-[10px] font-normal text-ink5 ml-1">({openAll.length} open)</span>
             </h2>
-            <Button variant="green" size="sm" onClick={() => router.push("/manager/create-task")}>
-              + Create &amp; Assign
+            <Button variant="green" size="sm" icon={ClipboardPlus} onClick={() => router.push("/manager/create-task")}>
+              Create &amp; Assign
             </Button>
           </div>
 
@@ -128,9 +130,9 @@ export default function ManagerDashboardPage() {
             </div>
           ) : tasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 bg-surf border border-dashed border-border rounded-[10px] text-center">
-              <span className="text-2xl mb-2">✓</span>
+              <Image src="/icons/3d/check_mark_button_3d.png" alt="" width={44} height={44} className="mb-2" />
               <p className="text-[12px] font-semibold text-ink">No tasks yet</p>
-              <p className="font-mono text-[10px] text-ink5 mt-1">Create the first one →</p>
+              <p className="text-[10px] text-ink5 mt-1">Create the first one to get started</p>
             </div>
           ) : (
             <div className="flex flex-col gap-1.5">
@@ -138,7 +140,7 @@ export default function ManagerDashboardPage() {
                 <TaskCard key={task.id} task={task} muted={task.status === "done"} onStatusChange={handleStatusChange} />
               ))}
               {tasks.length > 6 && (
-                <p className="font-mono text-[9px] text-ink5 text-center pt-1">
+                <p className="text-[11px] text-ink5 text-center pt-1">
                   +{tasks.length - 6} more · <button onClick={() => router.push("/tasks")} className="text-uac-green hover:underline">View all on board</button>
                 </p>
               )}
@@ -148,8 +150,8 @@ export default function ManagerDashboardPage() {
 
         {/* Today's activity */}
         <div>
-          <h2 className="text-[12px] font-bold text-ink flex items-center gap-1.5 mb-2.5">
-            <span className="text-uac-green text-[10px]">≡</span> Today&apos;s activity
+          <h2 className="text-[13px] font-bold text-ink flex items-center gap-1.5 mb-2.5">
+            <NotebookPen size={13} strokeWidth={2.25} className="text-uac-green" /> Today&apos;s activity
           </h2>
           {loading ? (
             <div className="space-y-1.5">
@@ -157,9 +159,9 @@ export default function ManagerDashboardPage() {
             </div>
           ) : logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 bg-surf border border-dashed border-border rounded-[10px] text-center">
-              <span className="text-2xl mb-2">📝</span>
+              <Image src="/icons/3d/memo_3d.png" alt="" width={44} height={44} className="mb-2" />
               <p className="text-[12px] font-semibold text-ink">No log entries yet</p>
-              <p className="font-mono text-[10px] text-ink5 mt-1">Staff haven&apos;t logged anything today</p>
+              <p className="text-[10px] text-ink5 mt-1">Staff haven&apos;t logged anything today</p>
             </div>
           ) : (
             <div className="flex flex-col gap-1.5">
@@ -167,7 +169,7 @@ export default function ManagerDashboardPage() {
                 <LogEntryCard key={entry.id} entry={entry} compact />
               ))}
               {logs.length > 5 && (
-                <p className="font-mono text-[9px] text-ink5 text-center pt-1">
+                <p className="text-[11px] text-ink5 text-center pt-1">
                   +{logs.length - 5} more entries today
                 </p>
               )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { LogEntryCard } from "@/components/ui/LogEntryCard";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +9,7 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { isRequired, sanitizeInput } from "@/lib/validators";
 import { getSocket } from "@/lib/socket";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 
 const categories = ["routine", "hardware", "network", "software", "setup"];
 
@@ -127,20 +129,20 @@ export default function LogPage() {
   return (
     <AppShell user={user} subtitle="Daily Log">
       <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">Daily Log</h1>
-      <p className="font-mono text-[10px] text-ink5 mb-4 sm:mb-5">
-        {"// "}{new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {entries.length} entries logged today
+      <p className="text-[11px] text-ink5 mb-4 sm:mb-5">
+        {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {entries.length} entries logged today
         {canManage && <span className="ml-2 text-uac-green">· hover an entry to edit or delete</span>}
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* ── New entry form ── */}
         <form onSubmit={handleSubmit} className="bg-surf border border-border rounded-[10px] p-4">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4 mb-3">
             New log entry
           </p>
 
           <div className="mb-3">
-            <label className="font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5">
+            <label className="text-[11px] font-semibold text-ink4 block mb-1.5">
               Activity description
             </label>
             <textarea
@@ -153,7 +155,7 @@ export default function LogPage() {
 
           <div className="grid grid-cols-2 gap-2.5 mb-3">
             <div>
-              <label className="font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5">Time</label>
+              <label className="text-[11px] font-semibold text-ink4 block mb-1.5">Time</label>
               <input
                 className="w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 font-mono text-[11px] text-ink outline-none"
                 value={new Date().toTimeString().slice(0, 5)}
@@ -161,7 +163,7 @@ export default function LogPage() {
               />
             </div>
             <div>
-              <label className="font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5">Category</label>
+              <label className="text-[11px] font-semibold text-ink4 block mb-1.5">Category</label>
               <select
                 className="w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none appearance-none"
                 value={category}
@@ -175,14 +177,14 @@ export default function LogPage() {
           </div>
 
           {error && (
-            <p className="font-mono text-[10px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
-              ⚠ {error}
+            <p className="flex items-center gap-1.5 text-[11px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
+              <AlertTriangle size={13} strokeWidth={2.25} /> {error}
             </p>
           )}
 
           <div className="flex gap-2 flex-wrap">
-            <Button type="submit" variant="green" disabled={saving}>
-              {saving ? "Saving…" : "Log entry →"}
+            <Button type="submit" variant="green" icon={ArrowRight} disabled={saving}>
+              {saving ? "Saving…" : "Log entry"}
             </Button>
             <Button type="button" variant="ghost" onClick={() => setDescription("")}>Clear</Button>
           </div>
@@ -192,12 +194,16 @@ export default function LogPage() {
         <div>
           <div className="flex items-center justify-between mb-2.5">
             <h2 className="text-[12px] font-bold text-ink">Today&apos;s entries</h2>
-            <span className="font-mono text-[9px] text-ink5">{entries.length} entries</span>
+            <span className="text-[10px] text-ink5">{entries.length} entries</span>
           </div>
           {loading ? (
-            <p className="font-mono text-[10px] text-ink5">Loading…</p>
+            <p className="text-[11px] text-ink5">Loading…</p>
           ) : entries.length === 0 ? (
-            <p className="font-mono text-[10px] text-ink5">No entries yet today — log your first activity!</p>
+            <div className="flex flex-col items-center justify-center py-8 text-center bg-surf border border-dashed border-border rounded-[10px]">
+              <Image src="/icons/3d/memo_3d.png" alt="" width={40} height={40} className="mb-2" />
+              <p className="text-[12px] font-semibold text-ink">No entries yet today</p>
+              <p className="text-[10px] text-ink5 mt-1">Log your first activity using the form</p>
+            </div>
           ) : (
             <div className="flex flex-col gap-1.5">
               {entries.map((entry) => (

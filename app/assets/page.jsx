@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { AssetCard } from "@/components/ui/AssetCard";
 import { StatCard } from "@/components/ui/StatCard";
@@ -9,6 +10,7 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { isRequired, sanitizeInput } from "@/lib/validators";
+import { X, AlertTriangle, ArrowRight, Plus } from "lucide-react";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
 function mapAsset(r) {
@@ -32,17 +34,17 @@ function mapAsset(r) {
 
 // ── Filter options ─────────────────────────────────────────────────────────────
 const TYPE_OPTIONS = [
-  { label: "All types",   value: "all"      },
-  { label: "💻 Laptop",   value: "laptop"   },
-  { label: "🖥 Desktop",  value: "desktop"  },
-  { label: "🖨 Printer",  value: "printer"  },
-  { label: "⚡ UPS",      value: "ups"      },
-  { label: "🔀 Switch",   value: "switch"   },
-  { label: "🗄 Server",   value: "server"   },
-  { label: "🖵 Monitor",  value: "monitor"  },
-  { label: "📱 Phone",    value: "phone"    },
-  { label: "⌨ Keyboard", value: "keyboard" },
-  { label: "📦 Other",    value: "other"    },
+  { label: "All types",  value: "all"      },
+  { label: "Laptop",     value: "laptop"   },
+  { label: "Desktop",    value: "desktop"  },
+  { label: "Printer",    value: "printer"  },
+  { label: "UPS",        value: "ups"      },
+  { label: "Switch",     value: "switch"   },
+  { label: "Server",     value: "server"   },
+  { label: "Monitor",    value: "monitor"  },
+  { label: "Phone",      value: "phone"    },
+  { label: "Keyboard",   value: "keyboard" },
+  { label: "Other",      value: "other"    },
 ];
 const STATUS_OPTIONS = [
   { label: "All statuses", value: "all"        },
@@ -57,7 +59,7 @@ function FilterPill({ label, active, onClick }) {
     <button
       onClick={onClick}
       className={cn(
-        "font-mono text-[9px] font-semibold px-2.5 py-1 rounded-full border transition-all duration-100 whitespace-nowrap",
+        "text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-all duration-100 whitespace-nowrap",
         active
           ? "bg-uac-green text-white border-uac-green"
           : "bg-surf text-ink4 border-border hover:border-uac-green hover:text-uac-green",
@@ -69,7 +71,7 @@ function FilterPill({ label, active, onClick }) {
 }
 
 const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
-const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
+const labelCls = "text-[11px] font-semibold text-ink4 block mb-1.5";
 
 // ── Shared validation for the Add/Edit asset forms ─────────────────────────────
 // name/location/department are the only required fields (matches the backend's
@@ -110,7 +112,7 @@ function AssetFormFields({ form, set }) {
           <label className={labelCls}>Type</label>
           <select className={inputCls} value={form.type} onChange={(e) => set("type", e.target.value)}>
             {TYPE_OPTIONS.filter((o) => o.value !== "all").map((o) => (
-              <option key={o.value} value={o.value}>{o.label.replace(/\S+\s/, "")}</option>
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
         </div>
@@ -195,16 +197,20 @@ function AddAssetForm({ onClose, onCreated }) {
   return (
     <form onSubmit={handleSubmit} className="bg-surf border border-border rounded-[10px] p-4 animate-fade-up">
       <div className="flex items-center justify-between mb-3">
-        <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4">Register new asset</p>
-        <button type="button" onClick={onClose} className="text-ink5 hover:text-ink text-sm leading-none">✕</button>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4">Register new asset</p>
+        <button type="button" onClick={onClose} className="text-ink5 hover:text-ink"><X size={15} strokeWidth={2.25} /></button>
       </div>
 
       <AssetFormFields form={form} set={set} />
 
-      {error && <p className="font-mono text-[10px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">⚠ {error}</p>}
+      {error && (
+        <p className="flex items-center gap-1.5 text-[11px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
+          <AlertTriangle size={13} strokeWidth={2.25} /> {error}
+        </p>
+      )}
 
-      <Button variant="green" className="w-full" type="submit" disabled={saving}>
-        {saving ? "Registering…" : "Register asset →"}
+      <Button variant="green" icon={ArrowRight} className="w-full justify-center" type="submit" disabled={saving}>
+        {saving ? "Registering…" : "Register asset"}
       </Button>
     </form>
   );
@@ -267,17 +273,21 @@ function EditAssetModal({ asset, onClose, onUpdated }) {
         className="relative bg-surf border border-border rounded-[12px] shadow-[0_8px_40px_rgba(17,19,24,0.18)] w-full max-w-md p-5 animate-fade-up overflow-y-auto max-h-[90vh]"
       >
         <div className="flex items-center justify-between mb-4">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4">Edit asset</p>
-          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink leading-none text-lg">✕</button>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4">Edit asset</p>
+          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink"><X size={16} strokeWidth={2.25} /></button>
         </div>
 
         <AssetFormFields form={form} set={set} />
 
-        {error && <p className="font-mono text-[10px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">⚠ {error}</p>}
+        {error && (
+          <p className="flex items-center gap-1.5 text-[11px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
+            <AlertTriangle size={13} strokeWidth={2.25} /> {error}
+          </p>
+        )}
 
         <div className="flex gap-2">
-          <Button variant="green" className="flex-1" type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save changes →"}
+          <Button variant="green" icon={ArrowRight} className="flex-1 justify-center" type="submit" disabled={saving}>
+            {saving ? "Saving…" : "Save changes"}
           </Button>
           <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
         </div>
@@ -335,13 +345,13 @@ export default function AssetsPage() {
         <div className="flex items-start justify-between mb-1">
           <div>
             <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink">Asset Register</h1>
-            <p className="font-mono text-[10px] text-ink5 mt-0.5">
-              {"// "}{loading ? "…" : assets.length} devices tracked · Dairies Plant IT Dept
+            <p className="text-[11px] text-ink5 mt-0.5">
+              {loading ? "…" : assets.length} devices tracked · Dairies Plant IT Dept
             </p>
           </div>
           {user?.role !== "manager" && (
-            <Button variant="soft-green" size="sm" onClick={() => setShowForm((v) => !v)}>
-              {showForm ? "✕ Cancel" : "+ Add asset"}
+            <Button variant="soft-green" size="sm" icon={showForm ? X : Plus} onClick={() => setShowForm((v) => !v)}>
+              {showForm ? "Cancel" : "Add asset"}
             </Button>
           )}
         </div>
@@ -368,12 +378,12 @@ export default function AssetsPage() {
               </div>
             </div>
 
-            <p className="font-mono text-[9px] text-ink5 mb-2">
+            <p className="text-[10px] text-ink5 mb-2">
               {filtered.length} asset{filtered.length !== 1 ? "s" : ""} shown
             </p>
 
             {loading ? (
-              <p className="font-mono text-[10px] text-ink5">Loading assets…</p>
+              <p className="text-[11px] text-ink5">Loading assets…</p>
             ) : filtered.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
                 {filtered.map((asset) => (
@@ -387,9 +397,9 @@ export default function AssetsPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-14 text-center">
-                <span className="text-3xl mb-3">📦</span>
+                <Image src="/icons/3d/package_3d.png" alt="" width={48} height={48} className="mb-3" />
                 <p className="text-[13px] font-semibold text-ink">No assets found</p>
-                <p className="font-mono text-[10px] text-ink5 mt-1">
+                <p className="text-[10px] text-ink5 mt-1">
                   {assets.length === 0 ? "Register your first asset using the button above" : "Try changing the filters above"}
                 </p>
               </div>

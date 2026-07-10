@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { isRequired, sanitizeInput } from "@/lib/validators";
 import { getSocket } from "@/lib/socket";
+import { Plus, X, AlertTriangle, ArrowRight } from "lucide-react";
 
 // ── API → UI mapper ───────────────────────────────────────────────────────────
 function mapTask(r) {
@@ -38,17 +39,18 @@ function mapTask(r) {
 
 const CATEGORIES = ["hardware", "network", "software", "urgent"];
 const PRIORITIES = [
-  { value: "high", label: "🔴 High" },
-  { value: "med",  label: "🟡 Medium" },
-  { value: "low",  label: "🟢 Low" },
+  { value: "high", label: "High" },
+  { value: "med",  label: "Medium" },
+  { value: "low",  label: "Low" },
 ];
+const STATUS_LABEL = { todo: "To Do", wip: "In Progress", done: "Done" };
 
 // ── Shared form fields ─────────────────────────────────────────────────────────
 const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
-const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
+const labelCls = "text-[11px] font-semibold text-ink4 block mb-1.5";
 
 // ── Add Task modal ────────────────────────────────────────────────────────────
-function AddTaskForm({ onClose, onCreated }) {
+function AddTaskForm({ onClose, onCreated, initialStatus = "todo" }) {
   const [title,       setTitle]       = useState("");
   const [description, setDescription] = useState("");
   const [category,    setCategory]    = useState("hardware");
@@ -73,7 +75,7 @@ function AddTaskForm({ onClose, onCreated }) {
         description: sanitizeInput(description) || undefined,
         category,
         priority,
-        status: "todo",
+        status: initialStatus,
       });
       onCreated(mapTask(res.task));
       onClose();
@@ -92,8 +94,8 @@ function AddTaskForm({ onClose, onCreated }) {
         className="relative bg-surf border border-border rounded-[12px] shadow-[0_8px_40px_rgba(17,19,24,0.18)] w-full max-w-md p-5 animate-fade-up"
       >
         <div className="flex items-center justify-between mb-4">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4">New task</p>
-          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink leading-none text-lg">✕</button>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4">New task · {STATUS_LABEL[initialStatus]}</p>
+          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink"><X size={16} strokeWidth={2.25} /></button>
         </div>
 
         <div className="mb-3">
@@ -133,14 +135,14 @@ function AddTaskForm({ onClose, onCreated }) {
         </div>
 
         {error && (
-          <p className="font-mono text-[10px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
-            ⚠ {error}
+          <p className="flex items-center gap-1.5 text-[11px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
+            <AlertTriangle size={13} strokeWidth={2.25} /> {error}
           </p>
         )}
 
         <div className="flex gap-2">
-          <Button type="submit" variant="green" disabled={saving} className="flex-1">
-            {saving ? "Creating…" : "Add to To Do →"}
+          <Button type="submit" variant="green" icon={ArrowRight} disabled={saving} className="flex-1 justify-center">
+            {saving ? "Creating…" : `Add to ${STATUS_LABEL[initialStatus]}`}
           </Button>
           <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
         </div>
@@ -193,8 +195,8 @@ function EditTaskForm({ task, onClose, onUpdated }) {
         className="relative bg-surf border border-border rounded-[12px] shadow-[0_8px_40px_rgba(17,19,24,0.18)] w-full max-w-md p-5 animate-fade-up"
       >
         <div className="flex items-center justify-between mb-4">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4">Edit task</p>
-          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink leading-none text-lg">✕</button>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4">Edit task</p>
+          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink"><X size={16} strokeWidth={2.25} /></button>
         </div>
 
         <div className="mb-3">
@@ -233,14 +235,14 @@ function EditTaskForm({ task, onClose, onUpdated }) {
         </div>
 
         {error && (
-          <p className="font-mono text-[10px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
-            ⚠ {error}
+          <p className="flex items-center gap-1.5 text-[11px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
+            <AlertTriangle size={13} strokeWidth={2.25} /> {error}
           </p>
         )}
 
         <div className="flex gap-2">
-          <Button type="submit" variant="green" disabled={saving} className="flex-1">
-            {saving ? "Saving…" : "Save changes →"}
+          <Button type="submit" variant="green" icon={ArrowRight} disabled={saving} className="flex-1 justify-center">
+            {saving ? "Saving…" : "Save changes"}
           </Button>
           <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
         </div>
@@ -255,6 +257,7 @@ export default function TasksPage() {
   const [tasks,       setTasks]       = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [showForm,    setShowForm]    = useState(false);
+  const [addStatus,   setAddStatus]   = useState("todo");
   const [editingTask, setEditingTask] = useState(null);
 
   const canManage = user?.role === "admin" || user?.role === "manager";
@@ -337,22 +340,27 @@ export default function TasksPage() {
   const wip  = tasks.filter((t) => t.status === "wip");
   const done = tasks.filter((t) => t.status === "done");
 
+  function openAddForm(status) {
+    setAddStatus(status);
+    setShowForm(true);
+  }
+
   return (
     <>
       <AppShell
         user={user}
         subtitle="Task Board"
         topbarActions={
-          <Button variant="soft-green" size="sm" onClick={() => setShowForm(true)}>
-            + New Task
+          <Button variant="soft-green" size="sm" icon={Plus} onClick={() => openAddForm("todo")}>
+            New Task
           </Button>
         }
       >
         <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">Task Board</h1>
-        <p className="font-mono text-[10px] text-ink5 mb-4 sm:mb-5 leading-relaxed">
+        <p className="text-[11px] text-ink5 mb-4 sm:mb-5 leading-relaxed">
           {loading
-            ? "// Loading tasks…"
-            : `// ${todo.length} open · ${wip.length} in progress · ${done.length} done`}
+            ? "Loading tasks…"
+            : `${todo.length} open · ${wip.length} in progress · ${done.length} done`}
           <span className="hidden sm:inline"> · hover a card to move it between columns</span>
           {canManage && <span className="ml-2 text-uac-green">· admin/manager: hover to edit or delete</span>}
         </p>
@@ -370,6 +378,7 @@ export default function TasksPage() {
               onStatusChange={handleStatusChange}
               onDelete={canManage ? handleDeleteTask : undefined}
               onEdit={canManage ? setEditingTask : undefined}
+              onAddCard={() => openAddForm("todo")}
             />
             <KanbanColumn
               title="In Progress"
@@ -378,6 +387,7 @@ export default function TasksPage() {
               onStatusChange={handleStatusChange}
               onDelete={canManage ? handleDeleteTask : undefined}
               onEdit={canManage ? setEditingTask : undefined}
+              onAddCard={() => openAddForm("wip")}
             />
             <div className="md:col-span-2 xl:col-span-1">
               <KanbanColumn
@@ -387,6 +397,7 @@ export default function TasksPage() {
                 onStatusChange={handleStatusChange}
                 onDelete={canManage ? handleDeleteTask : undefined}
                 onEdit={canManage ? setEditingTask : undefined}
+                onAddCard={() => openAddForm("done")}
               />
             </div>
           </div>
@@ -395,6 +406,7 @@ export default function TasksPage() {
 
       {showForm && (
         <AddTaskForm
+          initialStatus={addStatus}
           onClose={() => setShowForm(false)}
           onCreated={(newTask) => setTasks((prev) => [newTask, ...prev])}
         />

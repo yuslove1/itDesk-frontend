@@ -6,31 +6,36 @@ import { usePathname, useRouter } from "next/navigation";
 import { logout } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard, KanbanSquare, NotebookPen, ArrowLeftRight,
+  HardDrive, Share2, ClipboardPlus, LogOut, X,
+} from "lucide-react";
 
 // ── Static nav structure (counts are injected dynamically below) ────────────
 const staffNavBase = [
-  { label: "Dashboard", icon: "⬡", href: "/dashboard" },
-  { label: "Task Board", icon: "◫", href: "/tasks" },
-  { label: "Daily Log", icon: "≡", href: "/log" },
-  { label: "Handover Notes", icon: "⇄", href: "/handover" },
-  { label: "Asset Register", icon: "◈", href: "/assets" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+  { label: "Task Board", icon: KanbanSquare, href: "/tasks" },
+  { label: "Daily Log", icon: NotebookPen, href: "/log" },
+  { label: "Handover Notes", icon: ArrowLeftRight, href: "/handover" },
+  { label: "Asset Register", icon: HardDrive, href: "/assets" },
 ];
 const staffShareNav = [
-  { label: "Generate Report", icon: "↗", href: "/report" },
+  { label: "Generate Report", icon: Share2, href: "/report" },
 ];
 const managerNavBase = [
-  { label: "Dashboard", icon: "⬡", href: "/manager" },
-  { label: "All Tasks", icon: "◫", href: "/tasks" },
-  { label: "Activity Logs", icon: "≡", href: "/log" },
-  { label: "Handover Notes", icon: "⇄", href: "/handover" },
-  { label: "Asset Register", icon: "◈", href: "/assets" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/manager" },
+  { label: "All Tasks", icon: KanbanSquare, href: "/tasks" },
+  { label: "Activity Logs", icon: NotebookPen, href: "/log" },
+  { label: "Handover Notes", icon: ArrowLeftRight, href: "/handover" },
+  { label: "Asset Register", icon: HardDrive, href: "/assets" },
 ];
 const managerActionNav = [
-  { label: "Create & Assign Task", icon: "✦", href: "/manager/create-task" },
+  { label: "Create & Assign Task", icon: ClipboardPlus, href: "/manager/create-task" },
 ];
 
 // ── Single nav link ──────────────────────────────────────────────────────────
 function NavLink({ item, active, onClose }) {
+  const Icon = item.icon;
   return (
     <Link
       href={item.href}
@@ -42,14 +47,14 @@ function NavLink({ item, active, onClose }) {
           : "text-ink3 hover:bg-paper hover:text-ink",
       )}
     >
-      <span className={cn("text-[13px] w-4 text-center shrink-0", active ? "text-uac-green" : "text-ink5")}>
-        {item.icon}
+      <span className={cn("w-4 flex items-center justify-center shrink-0", active ? "text-uac-green" : "text-ink5")}>
+        <Icon size={14} strokeWidth={2.25} />
       </span>
       <span className="flex-1 truncate">{item.label}</span>
       {item.count !== undefined && item.count > 0 && (
         <span
           className={cn(
-            "font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
+            "text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center",
             item.countVariant === "green"
               ? "bg-uac-green-soft text-uac-green-dk"
               : "bg-uac-red-soft text-uac-red",
@@ -120,16 +125,16 @@ export function Sidebar({ role, user, onClose }) {
       <div className="lg:hidden flex justify-end px-3 pt-3">
         <button
           onClick={onClose}
-          className="text-ink4 hover:text-ink p-1 rounded hover:bg-paper transition-colors text-lg leading-none"
+          className="text-ink4 hover:text-ink p-1 rounded hover:bg-paper transition-colors"
           aria-label="Close menu"
         >
-          ✕
+          <X size={16} strokeWidth={2.25} />
         </button>
       </div>
 
       {/* Primary nav */}
       <div className="px-2.5 pt-4 mb-1">
-        <div className="font-mono text-[9px] font-semibold uppercase tracking-wider text-ink6 px-2 pb-1.5">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-ink6 px-2 pb-1.5">
           {primaryLabel}
         </div>
         {primaryNav.map((item) => (
@@ -141,7 +146,7 @@ export function Sidebar({ role, user, onClose }) {
 
       {/* Secondary nav */}
       <div className="px-2.5 mb-1">
-        <div className="font-mono text-[9px] font-semibold uppercase tracking-wider text-ink6 px-2 pb-1.5">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-ink6 px-2 pb-1.5">
           {secondaryLabel}
         </div>
         {secondaryNav.map((item) => (
@@ -165,20 +170,20 @@ export function Sidebar({ role, user, onClose }) {
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold text-ink truncate leading-tight">{user.name}</p>
-                <p className="font-mono text-[9px] text-ink5 truncate">{user.email ?? user.department}</p>
+                <p className="text-[10px] text-ink5 truncate">{user.email ?? user.department}</p>
               </div>
             </div>
 
             {/* Role chip */}
             <div className="flex items-center justify-between">
-              <span className={cn("font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded-full", roleColor[user.role])}>
+              <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize", roleColor[user.role])}>
                 {roleLabel[user.role]}
               </span>
               <button
                 onClick={handleSignOut}
-                className="font-mono text-[9px] text-uac-red hover:text-uac-red-dark flex items-center gap-1 transition-colors"
+                className="text-[10px] text-uac-red hover:text-uac-red-dark flex items-center gap-1 transition-colors"
               >
-                ← Sign out
+                <LogOut size={11} strokeWidth={2.25} /> Sign out
               </button>
             </div>
           </div>

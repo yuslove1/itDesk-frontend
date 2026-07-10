@@ -12,18 +12,19 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { isRequired, sanitizeInput } from "@/lib/validators";
+import { CheckCircle2, AlertTriangle, ArrowRight, ArrowUpLeft } from "lucide-react";
 
 // StaffUser shape: { id: string, name: string, email: string, role: string }
 
 const CATEGORIES = ["hardware", "network", "software", "urgent"];
 const PRIORITIES = [
-  { value: "high", label: "🔴 High" },
-  { value: "med",  label: "🟡 Medium" },
-  { value: "low",  label: "🟢 Low" },
+  { value: "high", label: "High" },
+  { value: "med",  label: "Medium" },
+  { value: "low",  label: "Low" },
 ];
 
 const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
-const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
+const labelCls = "text-[11px] font-semibold text-ink4 block mb-1.5";
 
 export default function CreateTaskPage() {
   const user   = useCurrentUser();
@@ -107,18 +108,18 @@ export default function CreateTaskPage() {
       <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">
         Create &amp; Assign Task
       </h1>
-      <p className="font-mono text-[10px] text-ink5 mb-4">
-        {"// "}Manager action · task appears on staff board immediately with the purple &ldquo;assigned by manager&rdquo; label
+      <p className="text-[11px] text-ink5 mb-4">
+        Manager action · task appears on staff board immediately with the purple &ldquo;assigned by manager&rdquo; label
       </p>
 
-      <Alert variant="green">
-        ✓&nbsp; As manager, tasks you create are flagged with a purple chip on the staff board.
+      <Alert variant="green" icon={CheckCircle2}>
+        As manager, tasks you create are flagged with a purple chip on the staff board.
       </Alert>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
         {/* ── Task details form ── */}
         <form id="create-task-form" onSubmit={handleSubmit} className="bg-surf border border-border rounded-[10px] p-4">
-          <p className={cn(labelCls, "tracking-widest mb-3")}>Task details</p>
+          <p className={cn(labelCls, "uppercase tracking-wide mb-3")}>Task details</p>
 
           <div className="mb-3">
             <label className={labelCls}>Task title *</label>
@@ -157,8 +158,8 @@ export default function CreateTaskPage() {
           </div>
 
           {error && (
-            <p className="font-mono text-[10px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
-              ⚠ {error}
+            <p className="flex items-center gap-1.5 text-[11px] text-uac-red bg-uac-red-soft px-2.5 py-1.5 rounded-[6px] mb-3">
+              <AlertTriangle size={13} strokeWidth={2.25} /> {error}
             </p>
           )}
         </form>
@@ -167,7 +168,7 @@ export default function CreateTaskPage() {
         <div className="flex flex-col gap-3">
           {/* Assignee */}
           <div className="bg-surf border border-border rounded-[10px] p-4">
-            <p className={cn(labelCls, "tracking-widest mb-3")}>Assign to staff member</p>
+            <p className={cn(labelCls, "uppercase tracking-wide mb-3")}>Assign to staff member</p>
 
             <div className="mb-3">
               <label className={labelCls}>Assignee</label>
@@ -198,14 +199,14 @@ export default function CreateTaskPage() {
                 />
                 <div className="min-w-0">
                   <p className="text-[12px] font-bold text-uac-green-dk">{selectedStaff.name}</p>
-                  <p className="font-mono text-[9px] text-uac-green truncate">{selectedStaff.email}</p>
+                  <p className="text-[10px] text-uac-green truncate">{selectedStaff.email}</p>
                 </div>
                 <div className="ml-auto shrink-0">
                   <Badge role="staff" />
                 </div>
               </div>
             ) : (
-              <p className="font-mono text-[9px] text-ink5">
+              <p className="text-[10px] text-ink5">
                 Task will be visible to all IT staff on the board.
               </p>
             )}
@@ -213,12 +214,12 @@ export default function CreateTaskPage() {
 
           {/* Live preview */}
           <div className="bg-surf border border-border rounded-[10px] p-4">
-            <p className={cn(labelCls, "tracking-widest mb-2.5")}>
+            <p className={cn(labelCls, "uppercase tracking-wide mb-2.5")}>
               Preview — how it appears on staff board
             </p>
             <TaskCard task={previewTask} />
-            <p className="font-mono text-[9px] text-ink5 mt-2">
-              ↑ Purple &ldquo;assigned by manager&rdquo; label flags this as a manager task
+            <p className="flex items-center gap-1 text-[10px] text-ink5 mt-2">
+              <ArrowUpLeft size={11} strokeWidth={2.25} /> Purple &ldquo;assigned by manager&rdquo; label flags this as a manager task
             </p>
           </div>
 
@@ -228,10 +229,11 @@ export default function CreateTaskPage() {
               type="submit"
               form="create-task-form"
               variant="green"
+              icon={ArrowRight}
               className="flex-1 justify-center"
               disabled={saving}
             >
-              {saving ? "Creating…" : "Assign task →"}
+              {saving ? "Creating…" : "Assign task"}
             </Button>
             <Button type="button" variant="ghost" onClick={() => router.back()}>
               Cancel

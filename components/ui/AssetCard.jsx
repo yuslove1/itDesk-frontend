@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  Laptop, Cpu, Printer, BatteryCharging, Network, Server,
+  Monitor, Smartphone, Keyboard, Package, MapPin, Pencil, Trash2,
+} from "lucide-react";
 
 const typeIcon = {
-  laptop: "💻", desktop: "🖥", printer: "🖨", ups: "⚡",
-  switch: "🔀", server: "🗄", monitor: "🖵", phone: "📱",
-  keyboard: "⌨", other: "📦",
+  laptop: Laptop, desktop: Cpu, printer: Printer, ups: BatteryCharging,
+  switch: Network, server: Server, monitor: Monitor, phone: Smartphone,
+  keyboard: Keyboard, other: Package,
 };
 
 const statusStyles = {
@@ -19,6 +23,7 @@ const statusStyles = {
 export function AssetCard({ asset, onDelete, onEdit }) {
   const { pill, dot, label } = statusStyles[asset.status];
   const muted = asset.status === "retired";
+  const TypeIcon = typeIcon[asset.type];
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting,   setDeleting]   = useState(false);
 
@@ -39,14 +44,14 @@ export function AssetCard({ asset, onDelete, onEdit }) {
     )}>
       {/* Top row */}
       <div className="flex items-start gap-2 mb-2">
-        <span className="text-[18px] leading-none shrink-0 mt-0.5" role="img" aria-label={asset.type}>
-          {typeIcon[asset.type]}
+        <span className="shrink-0 mt-0.5 w-6 h-6 rounded-[6px] bg-paper border border-border flex items-center justify-center text-ink3">
+          <TypeIcon size={13} strokeWidth={2.25} />
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-semibold text-ink leading-snug truncate">{asset.name}</p>
-          <p className="font-mono text-[9px] text-ink5 capitalize mt-0.5">{asset.type}</p>
+          <p className="text-[10px] text-ink5 capitalize mt-0.5">{asset.type}</p>
         </div>
-        <span className={cn("flex items-center gap-1 font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded-full shrink-0", pill)}>
+        <span className={cn("flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0", pill)}>
           <span className={cn("w-1 h-1 rounded-full shrink-0", dot)} />{label}
         </span>
       </div>
@@ -56,8 +61,10 @@ export function AssetCard({ asset, onDelete, onEdit }) {
       )}
 
       <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-        <span className="font-mono text-[9px] bg-paper border border-border text-ink4 px-1.5 py-0.5 rounded-[4px]">📍 {asset.location}</span>
-        <span className="font-mono text-[9px] bg-paper border border-border text-ink4 px-1.5 py-0.5 rounded-[4px]">{asset.department}</span>
+        <span className="flex items-center gap-1 text-[10px] bg-paper border border-border text-ink4 px-1.5 py-0.5 rounded-[4px]">
+          <MapPin size={10} strokeWidth={2.25} /> {asset.location}
+        </span>
+        <span className="text-[10px] bg-paper border border-border text-ink4 px-1.5 py-0.5 rounded-[4px]">{asset.department}</span>
       </div>
 
       {asset.notes && <p className="text-[10px] text-ink4 leading-snug mt-1.5 line-clamp-2">{asset.notes}</p>}
@@ -67,7 +74,7 @@ export function AssetCard({ asset, onDelete, onEdit }) {
         {asset.warrantyExpiry ? (
           <span className="font-mono text-[9px] text-ink5">Warranty: {asset.warrantyExpiry}</span>
         ) : (
-          <span className="font-mono text-[9px] text-ink6">No warranty info</span>
+          <span className="text-[10px] text-ink6">No warranty info</span>
         )}
         <span className="font-mono text-[9px] text-ink6 ml-auto">Added {asset.addedAt}</span>
       </div>
@@ -77,22 +84,22 @@ export function AssetCard({ asset, onDelete, onEdit }) {
         <div className="flex gap-1.5 mt-2 pt-1.5 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           {onEdit && (
             <button onClick={() => { setConfirmDel(false); onEdit(asset); }}
-              className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors">
-              ✏ Edit
+              className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors">
+              <Pencil size={11} strokeWidth={2.25} /> Edit
             </button>
           )}
           {onDelete && (
             <button onClick={handleDelete} disabled={deleting}
               className={cn(
-                "font-mono text-[9px] font-semibold px-2 py-0.5 rounded border transition-colors",
+                "flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors",
                 confirmDel ? "border-uac-red bg-uac-red text-white" : "border-border text-ink5 hover:border-uac-red hover:text-uac-red",
                 deleting && "opacity-50 cursor-wait",
               )}>
-              {deleting ? "Deleting…" : confirmDel ? "Confirm?" : "🗑 Delete"}
+              {deleting ? "Deleting…" : confirmDel ? "Confirm?" : (<><Trash2 size={11} strokeWidth={2.25} /> Delete</>)}
             </button>
           )}
           {confirmDel && (
-            <button onClick={() => setConfirmDel(false)} className="font-mono text-[9px] text-ink5 hover:text-ink px-1">Cancel</button>
+            <button onClick={() => setConfirmDel(false)} className="text-[10px] text-ink5 hover:text-ink px-1">Cancel</button>
           )}
         </div>
       )}

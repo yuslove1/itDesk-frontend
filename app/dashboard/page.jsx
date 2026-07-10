@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui/StatCard";
 import { TaskCard } from "@/components/ui/TaskCard";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { ClipboardList, Timer, CheckCircle2, FileText, KanbanSquare, NotebookPen, ArrowRight, Plus } from "lucide-react";
 
 function mapTask(r) {
   const initials = r.author?.name
@@ -44,9 +46,9 @@ function getGreeting() {
 function EmptyState({ icon, title, sub }) {
   return (
     <div className="flex flex-col items-center justify-center py-8 text-center bg-surf border border-dashed border-border rounded-[10px]">
-      <span className="text-2xl mb-2">{icon}</span>
+      <Image src={icon} alt="" width={44} height={44} className="mb-2" />
       <p className="text-[12px] font-semibold text-ink">{title}</p>
-      <p className="font-mono text-[10px] text-ink5 mt-1">{sub}</p>
+      <p className="text-[10px] text-ink5 mt-1">{sub}</p>
     </div>
   );
 }
@@ -87,16 +89,19 @@ export default function DashboardPage() {
       <div className="bg-surf border border-border rounded-[10px] px-5 py-4 mb-4 flex items-center justify-between animate-fade-up overflow-hidden relative">
         {/* Subtle left accent */}
         <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-uac-green rounded-l-[10px]" />
-        <div className="pl-2">
-          <h1 className="text-[18px] sm:text-[20px] font-bold tracking-tight text-ink">
-            {getGreeting()}, {user?.name ?? "…"} ☀
-          </h1>
-          <p className="font-mono text-[10px] text-ink5 mt-0.5">
-            {"// "}{today} · Dairies Plant IT Support
-          </p>
+        <div className="pl-2 flex items-center gap-3">
+          <Image src="/icons/3d/sun_3d.png" alt="" width={36} height={36} className="hidden sm:block shrink-0" />
+          <div>
+            <h1 className="text-[18px] sm:text-[20px] font-bold tracking-tight text-ink">
+              {getGreeting()}, {user?.name ?? "…"}
+            </h1>
+            <p className="text-[11px] text-ink5 mt-0.5">
+              {today} · Dairies Plant IT Support
+            </p>
+          </div>
         </div>
         <div className="hidden sm:flex flex-col items-end gap-1">
-          <span className="font-mono text-[9px] text-ink6 uppercase tracking-wider">Time</span>
+          <span className="text-[10px] text-ink6 uppercase tracking-wider">Time</span>
           <span className="font-mono text-[13px] font-bold text-ink">
             {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
           </span>
@@ -106,25 +111,25 @@ export default function DashboardPage() {
       {/* ── Stat strip ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-5 animate-fade-up">
         <StatCard
-          icon="📋" label="Open tasks"
+          icon={ClipboardList} label="Open tasks"
           value={loading ? "…" : todo.length}
-          detail={loading ? undefined : todo.length > 0 ? `${todo.length} need attention` : "All clear ✓"}
+          detail={loading ? undefined : todo.length > 0 ? `${todo.length} need attention` : "All clear"}
           variant="red"
         />
         <StatCard
-          icon="⚙" label="In progress"
+          icon={Timer} label="In progress"
           value={loading ? "…" : wip.length}
           detail={loading ? undefined : wip.length > 0 ? "Active now" : "None active"}
           variant="amber"
         />
         <StatCard
-          icon="✓" label="Done today"
+          icon={CheckCircle2} label="Done today"
           value={loading ? "…" : done.length}
-          detail={loading ? undefined : done.length > 0 ? "Good pace ↑" : "Get started"}
+          detail={loading ? undefined : done.length > 0 ? "Good pace" : "Get started"}
           variant="green"
         />
         <StatCard
-          icon="📝" label="Log entries"
+          icon={FileText} label="Log entries"
           value={loading ? "…" : logs.length}
           detail="today"
         />
@@ -135,11 +140,11 @@ export default function DashboardPage() {
         {/* Active tasks */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-[12px] font-bold text-ink flex items-center gap-1.5">
-              <span className="text-uac-red text-[10px]">◫</span> Active tasks
+            <h2 className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+              <KanbanSquare size={13} strokeWidth={2.25} className="text-uac-red" /> Active tasks
             </h2>
-            <Button variant="soft-green" size="sm" onClick={() => router.push("/tasks")}>
-              View all →
+            <Button variant="soft-green" size="sm" icon={ArrowRight} onClick={() => router.push("/tasks")}>
+              View all
             </Button>
           </div>
           {loading ? (
@@ -147,7 +152,7 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-[8px]" />)}
             </div>
           ) : active.length === 0 ? (
-            <EmptyState icon="✓" title="All clear!" sub="No active tasks — add one from Task Board" />
+            <EmptyState icon="/icons/3d/check_mark_button_3d.png" title="All clear!" sub="No active tasks — add one from Task Board" />
           ) : (
             <div className="flex flex-col gap-1.5">
               {active.map((task) => <TaskCard key={task.id} task={task} />)}
@@ -158,11 +163,11 @@ export default function DashboardPage() {
         {/* Today's log */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-[12px] font-bold text-ink flex items-center gap-1.5">
-              <span className="text-uac-green text-[10px]">≡</span> Today&apos;s log
+            <h2 className="text-[13px] font-bold text-ink flex items-center gap-1.5">
+              <NotebookPen size={13} strokeWidth={2.25} className="text-uac-green" /> Today&apos;s log
             </h2>
-            <Button variant="outline-green" size="sm" onClick={() => router.push("/log")}>
-              + Log entry
+            <Button variant="outline-green" size="sm" icon={Plus} onClick={() => router.push("/log")}>
+              Log entry
             </Button>
           </div>
           {loading ? (
@@ -170,16 +175,16 @@ export default function DashboardPage() {
               {[1, 2].map((i) => <div key={i} className="skeleton h-12 rounded-[8px]" />)}
             </div>
           ) : logs.length === 0 ? (
-            <EmptyState icon="📝" title="No entries yet" sub="Log your first activity for today" />
+            <EmptyState icon="/icons/3d/memo_3d.png" title="No entries yet" sub="Log your first activity for today" />
           ) : (
             <div className="flex flex-col gap-1.5">
               {logs.slice(0, 3).map((entry) => <LogEntryCard key={entry.id} entry={entry} compact />)}
               {logs.length > 3 && (
                 <button
                   onClick={() => router.push("/log")}
-                  className="font-mono text-[9px] text-uac-green hover:underline text-center pt-1"
+                  className="text-[11px] text-uac-green hover:underline text-center pt-1 flex items-center justify-center gap-1"
                 >
-                  +{logs.length - 3} more entries →
+                  +{logs.length - 3} more entries <ArrowRight size={12} strokeWidth={2.25} />
                 </button>
               )}
             </div>

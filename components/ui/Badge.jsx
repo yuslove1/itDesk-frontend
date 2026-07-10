@@ -12,7 +12,7 @@ export function Badge({ role, className }) {
   return (
     <span
       className={cn(
-        "font-mono text-[9px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide",
+        "text-[10px] font-semibold px-2 py-0.5 rounded capitalize",
         styles[role],
         className,
       )}

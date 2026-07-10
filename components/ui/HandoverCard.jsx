@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Pencil, Trash2 } from "lucide-react";
 
 const TRUNCATE_AT = 120; // chars before we add "show more"
 
@@ -33,7 +34,7 @@ export function HandoverCard({ note, onDelete, onEdit }) {
         {isTruncatable && (
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="ml-1 font-mono text-[9px] text-uac-green hover:underline whitespace-nowrap"
+            className="ml-1 text-[10px] text-uac-green hover:underline whitespace-nowrap"
           >
             {expanded ? "show less" : "show more"}
           </button>
@@ -41,9 +42,9 @@ export function HandoverCard({ note, onDelete, onEdit }) {
       </p>
 
       <div className={cn("mt-2.5 flex items-center gap-2 flex-wrap", confirmDel && "opacity-100")}>
-        <span className="font-mono text-[9px] text-ink5">{note.updatedAt}</span>
+        <span className="text-[10px] text-ink5">{note.updatedAt}</span>
         {note.isActive && (
-          <span className="font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded bg-uac-green-soft text-uac-green-dk">active</span>
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-uac-green-soft text-uac-green-dk">active</span>
         )}
 
         {/* Edit + Delete — visible on hover for admin/manager */}
@@ -55,9 +56,9 @@ export function HandoverCard({ note, onDelete, onEdit }) {
             {onEdit && (
               <button
                 onClick={() => { setConfirmDel(false); onEdit(note); }}
-                className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
+                className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
               >
-                ✏ Edit
+                <Pencil size={11} strokeWidth={2.25} /> Edit
               </button>
             )}
             {onDelete && (
@@ -65,16 +66,16 @@ export function HandoverCard({ note, onDelete, onEdit }) {
                 onClick={handleDelete}
                 disabled={deleting}
                 className={cn(
-                  "font-mono text-[9px] font-semibold px-2 py-0.5 rounded border transition-colors",
+                  "flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors",
                   confirmDel ? "border-uac-red bg-uac-red text-white" : "border-border text-ink5 hover:border-uac-red hover:text-uac-red",
                   deleting && "opacity-50 cursor-wait",
                 )}
               >
-                {deleting ? "Deleting…" : confirmDel ? "Confirm?" : "🗑 Delete"}
+                {deleting ? "Deleting…" : confirmDel ? "Confirm?" : (<><Trash2 size={11} strokeWidth={2.25} /> Delete</>)}
               </button>
             )}
             {confirmDel && (
-              <button onClick={() => setConfirmDel(false)} className="font-mono text-[9px] text-ink5 hover:text-ink px-1">Cancel</button>
+              <button onClick={() => setConfirmDel(false)} className="text-[10px] text-ink5 hover:text-ink px-1">Cancel</button>
             )}
           </div>
         )}

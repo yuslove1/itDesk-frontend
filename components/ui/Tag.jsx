@@ -13,7 +13,7 @@ export function Tag({ category, className }) {
   return (
     <span
       className={cn(
-        "font-mono text-[9px] font-medium px-1.5 py-0.5 rounded tracking-wide",
+        "text-[10px] font-medium px-1.5 py-0.5 rounded capitalize",
         styles[category],
         className,
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { AppShell } from "@/components/layout/AppShell";
 import { HandoverCard } from "@/components/ui/HandoverCard";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +9,7 @@ import { useCurrentUser } from "@/lib/hooks/useCurrentUser";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { isRequired, sanitizeInput } from "@/lib/validators";
+import { X, AlertTriangle, ArrowRight } from "lucide-react";
 
 function mapNote(r) {
   return {
@@ -22,7 +24,7 @@ function mapNote(r) {
 }
 
 const inputCls = "w-full bg-paper border border-border rounded-[6px] px-2.5 py-1.5 text-[12px] text-ink outline-none focus:border-uac-green transition-colors";
-const labelCls = "font-mono text-[9px] font-semibold uppercase tracking-wide text-ink4 block mb-1.5";
+const labelCls = "text-[11px] font-semibold text-ink4 block mb-1.5";
 
 // ── Edit Note modal ─────────────────────────────────────────────────────────
 function EditNoteModal({ note, onClose, onUpdated }) {
@@ -65,8 +67,8 @@ function EditNoteModal({ note, onClose, onUpdated }) {
         className="relative bg-surf border border-border rounded-[12px] shadow-[0_8px_40px_rgba(17,19,24,0.18)] w-full max-w-md p-5 animate-fade-up"
       >
         <div className="flex items-center justify-between mb-4">
-          <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4">Edit handover note</p>
-          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink leading-none text-lg">✕</button>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4">Edit handover note</p>
+          <button type="button" onClick={onClose} className="text-ink5 hover:text-ink"><X size={16} strokeWidth={2.25} /></button>
         </div>
 
         <div className="mb-3">
@@ -90,12 +92,14 @@ function EditNoteModal({ note, onClose, onUpdated }) {
         </div>
 
         {error && (
-          <p className="font-mono text-[10px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">⚠ {error}</p>
+          <p className="flex items-center gap-1.5 text-[11px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
+            <AlertTriangle size={13} strokeWidth={2.25} /> {error}
+          </p>
         )}
 
         <div className="flex gap-2">
-          <Button variant="green" className="flex-1" type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save changes →"}
+          <Button variant="green" icon={ArrowRight} className="flex-1 justify-center" type="submit" disabled={saving}>
+            {saving ? "Saving…" : "Save changes"}
           </Button>
           <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
         </div>
@@ -169,8 +173,8 @@ export default function HandoverPage() {
     <>
       <AppShell user={user} subtitle="Handover Notes">
         <h1 className="text-[16px] sm:text-[18px] font-bold tracking-tight text-ink mb-0.5">Handover Notes</h1>
-        <p className="font-mono text-[10px] text-ink5 mb-4">
-          {"// "}Context for the next IT person · {notes.length} active notes
+        <p className="text-[11px] text-ink5 mb-4">
+          Context for the next IT person · {notes.length} active notes
           {canManage && <span className="ml-2 text-uac-green">· hover a note to edit or delete</span>}
         </p>
 
@@ -181,9 +185,13 @@ export default function HandoverPage() {
               <h2 className="text-[12px] font-bold text-ink">Active notes</h2>
             </div>
             {loading ? (
-              <p className="font-mono text-[10px] text-ink5">Loading…</p>
+              <p className="text-[11px] text-ink5">Loading…</p>
             ) : notes.length === 0 ? (
-              <p className="font-mono text-[10px] text-ink5">No handover notes yet. Add your first one →</p>
+              <div className="flex flex-col items-center justify-center py-8 text-center bg-surf border border-dashed border-border rounded-[10px]">
+                <Image src="/icons/3d/wrench_3d.png" alt="" width={40} height={40} className="mb-2" />
+                <p className="text-[12px] font-semibold text-ink">No handover notes yet</p>
+                <p className="text-[10px] text-ink5 mt-1">Add your first one using the form</p>
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {notes.map((note) => (
@@ -200,7 +208,7 @@ export default function HandoverPage() {
 
           {/* New note form */}
           <form onSubmit={handleSubmit} className="bg-surf border border-border rounded-[10px] p-4">
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink4 mb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink4 mb-3">
               New handover note
             </p>
             <div className="mb-3">
@@ -223,13 +231,13 @@ export default function HandoverPage() {
             </div>
 
             {error && (
-              <p className="font-mono text-[10px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
-                ⚠ {error}
+              <p className="flex items-center gap-1.5 text-[11px] text-uac-red mb-2 bg-uac-red-soft px-2 py-1 rounded">
+                <AlertTriangle size={13} strokeWidth={2.25} /> {error}
               </p>
             )}
 
-            <Button variant="green" type="submit" disabled={saving}>
-              {saving ? "Saving…" : "Save note →"}
+            <Button variant="green" icon={ArrowRight} type="submit" disabled={saving}>
+              {saving ? "Saving…" : "Save note"}
             </Button>
           </form>
         </div>

@@ -31,7 +31,8 @@ const variants = {
   },
 };
 
-export function StatCard({ label, value, detail, icon, variant = "default" }) {
+/** `icon` is a lucide-react component reference (e.g. `ClipboardList`), not an element. */
+export function StatCard({ label, value, detail, icon: Icon, variant = "default" }) {
   const v = variants[variant];
   return (
     <div className={cn("rounded-[10px] border relative overflow-hidden card-lift", v.wrap)}>
@@ -50,8 +51,8 @@ export function StatCard({ label, value, detail, icon, variant = "default" }) {
       <div className="pl-4 pr-3.5 pt-3.5 pb-3">
         {/* Label row */}
         <div className="flex items-center gap-1.5 mb-2">
-          {icon && <span className="text-[13px]">{icon}</span>}
-          <span className="font-mono text-[9px] font-semibold uppercase tracking-wider text-ink4">
+          {Icon && <Icon size={13} strokeWidth={2.25} />}
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-ink4">
             {label}
           </span>
         </div>
@@ -63,7 +64,7 @@ export function StatCard({ label, value, detail, icon, variant = "default" }) {
 
         {/* Detail */}
         {detail && (
-          <div className={cn("font-mono text-[9px] mt-1.5 font-medium", v.detail)}>
+          <div className={cn("text-[10px] mt-1.5 font-medium", v.detail)}>
             {detail}
           </div>
         )}

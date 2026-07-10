@@ -5,6 +5,7 @@ import { Tag } from "./Tag";
 import { Avatar } from "./Avatar";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Flag, ChevronDown, Pencil, Trash2, Play, Check, RotateCcw } from "lucide-react";
 
 const priorityStripe = {
   high: "border-l-uac-red",
@@ -12,19 +13,25 @@ const priorityStripe = {
   low:  "border-l-uac-green",
 };
 
+const priorityColor = {
+  high: "text-uac-red",
+  med:  "text-amber",
+  low:  "text-uac-green",
+};
+
 const priorityLabel = {
-  high: "🔴 High",
-  med:  "🟡 Medium",
-  low:  "🟢 Low",
+  high: "High",
+  med:  "Medium",
+  low:  "Low",
 };
 
 const STATUS_ACTIONS = {
-  todo: [{ label: "▶ Start",   to: "wip",  style: "bg-amber-soft text-amber border-amber/30 hover:bg-amber/20" }],
+  todo: [{ label: "Start",   icon: Play,      to: "wip",  style: "bg-amber-soft text-amber border-amber/30 hover:bg-amber/20" }],
   wip:  [
-    { label: "✓ Done",   to: "done", style: "bg-uac-green-soft text-uac-green-dk border-uac-green/30 hover:bg-uac-green-mid/30" },
-    { label: "← Reopen", to: "todo", style: "bg-paper text-ink4 border-border hover:border-ink4 hover:text-ink" },
+    { label: "Done",   icon: Check,     to: "done", style: "bg-uac-green-soft text-uac-green-dk border-uac-green/30 hover:bg-uac-green-mid/30" },
+    { label: "Reopen", icon: RotateCcw, to: "todo", style: "bg-paper text-ink4 border-border hover:border-ink4 hover:text-ink" },
   ],
-  done: [{ label: "↩ Reopen", to: "wip", style: "bg-paper text-ink4 border-border hover:border-ink4 hover:text-ink" }],
+  done: [{ label: "Reopen", icon: RotateCcw, to: "wip", style: "bg-paper text-ink4 border-border hover:border-ink4 hover:text-ink" }],
 };
 
 export function TaskCard({ task, muted, className, onStatusChange, onDelete, onEdit }) {
@@ -69,14 +76,15 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
 
       {/* Tags row */}
       <div className="flex items-center gap-1.5 flex-wrap">
+        <Flag size={11} strokeWidth={2.5} className={cn("shrink-0", priorityColor[task.priority])} fill="currentColor" />
         <Tag category={task.category} />
         <Pill status={task.status} />
-        <span className="font-mono text-[9px] text-ink5 ml-auto">{task.createdAt}</span>
+        <span className="text-[10px] text-ink5 ml-auto">{task.createdAt}</span>
       </div>
 
       {/* Assignee */}
       {(task.assignedTo || task.isManagerAssigned) && (
-        <div className="flex items-center gap-1.5 mt-1.5 font-mono text-[9px] text-ink4">
+        <div className="flex items-center gap-1.5 mt-1.5 text-[10px] text-ink4">
           <Avatar
             initials={task.isManagerAssigned ? (task.assignedBy?.initials ?? "LM") : task.assignedTo.initials}
             role={task.isManagerAssigned ? "manager" : "staff"}
@@ -88,7 +96,7 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
             <span>Assigned to you</span>
           )}
           {task.priority === "high" && !task.isManagerAssigned && (
-            <span className="ml-auto text-uac-red">urgent</span>
+            <span className="ml-auto text-uac-red font-semibold">urgent</span>
           )}
         </div>
       )}
@@ -96,10 +104,10 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
       {/* ── Toggle details button ── */}
       <button
         onClick={() => { setExpanded((v) => !v); setConfirmDel(false); }}
-        className="mt-2 flex items-center gap-1 font-mono text-[9px] font-semibold text-uac-green hover:text-uac-green-dk transition-colors"
+        className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-uac-green hover:text-uac-green-dk transition-colors"
       >
-        <span className={cn("transition-transform duration-150 inline-block", expanded && "rotate-180")}>▾</span>
-        {expanded ? "close details" : "view details"}
+        <ChevronDown size={12} strokeWidth={2.5} className={cn("transition-transform duration-150", expanded && "rotate-180")} />
+        {expanded ? "Close details" : "View details"}
       </button>
 
       {/* ── Expanded details section ── */}
@@ -111,9 +119,9 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
             <p className="text-[10px] text-ink6 italic">No description provided.</p>
           )}
           <div className="flex flex-wrap gap-2 mt-1">
-            <span className="font-mono text-[9px] text-ink5">Priority: <span className="text-ink3">{priorityLabel[task.priority]}</span></span>
-            <span className="font-mono text-[9px] text-ink5">Category: <span className="text-ink3 capitalize">{task.category}</span></span>
-            <span className="font-mono text-[9px] text-ink5">Status: <span className="text-ink3 capitalize">{task.status}</span></span>
+            <span className="text-[10px] text-ink5">Priority: <span className="text-ink3">{priorityLabel[task.priority]}</span></span>
+            <span className="text-[10px] text-ink5">Category: <span className="text-ink3 capitalize">{task.category}</span></span>
+            <span className="text-[10px] text-ink5">Status: <span className="text-ink3 capitalize">{task.status}</span></span>
           </div>
         </div>
       )}
@@ -128,9 +136,9 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
           {onEdit && (
             <button
               onClick={() => { setConfirmDel(false); onEdit(task); }}
-              className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
+              className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
             >
-              ✏ Edit
+              <Pencil size={11} strokeWidth={2.25} /> Edit
             </button>
           )}
           {onDelete && (
@@ -138,20 +146,20 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
               onClick={handleDelete}
               disabled={deleting}
               className={cn(
-                "font-mono text-[9px] font-semibold px-2 py-0.5 rounded border transition-colors",
+                "flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors",
                 confirmDel
                   ? "border-uac-red bg-uac-red text-white hover:bg-uac-red-dark"
                   : "border-border text-ink5 hover:border-uac-red hover:text-uac-red",
                 deleting && "opacity-50 cursor-wait",
               )}
             >
-              {deleting ? "Deleting…" : confirmDel ? "Confirm delete?" : "🗑 Delete"}
+              {deleting ? "Deleting…" : confirmDel ? "Confirm delete?" : (<><Trash2 size={11} strokeWidth={2.25} /> Delete</>)}
             </button>
           )}
           {confirmDel && (
             <button
               onClick={() => setConfirmDel(false)}
-              className="font-mono text-[9px] text-ink5 hover:text-ink px-1"
+              className="text-[10px] text-ink5 hover:text-ink px-1"
             >
               Cancel
             </button>
@@ -167,9 +175,9 @@ export function TaskCard({ task, muted, className, onStatusChange, onDelete, onE
               key={action.to}
               disabled={moving}
               onClick={() => handleMove(action.to)}
-              className={cn("font-mono text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-colors", action.style, moving && "cursor-wait")}
+              className={cn("flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-colors", action.style, moving && "cursor-wait")}
             >
-              {moving ? "…" : action.label}
+              {moving ? "…" : (<><action.icon size={11} strokeWidth={2.5} /> {action.label}</>)}
             </button>
           ))}
         </div>

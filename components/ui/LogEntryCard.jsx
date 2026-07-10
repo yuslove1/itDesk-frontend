@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Pencil, Trash2, X, ArrowRight } from "lucide-react";
 
 const tagColor = {
   routine:  "bg-uac-green-soft text-uac-green-dk",
@@ -89,13 +90,13 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
               <button
                 onClick={handleSaveEdit}
                 disabled={saving || !editContent.trim()}
-                className="font-mono text-[9px] font-semibold px-2.5 py-0.5 rounded border border-uac-green bg-uac-green text-white hover:bg-uac-green-dk transition-colors disabled:opacity-50 disabled:cursor-wait"
+                className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded border border-uac-green bg-uac-green text-white hover:bg-uac-green-dk transition-colors disabled:opacity-50 disabled:cursor-wait"
               >
-                {saving ? "Saving…" : "Save →"}
+                {saving ? "Saving…" : (<>Save <ArrowRight size={11} strokeWidth={2.25} /></>)}
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="font-mono text-[9px] text-ink5 hover:text-ink px-1.5"
+                className="text-[10px] text-ink5 hover:text-ink px-1.5"
               >
                 Cancel
               </button>
@@ -107,7 +108,7 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
             <span className="text-[11px] text-ink2 leading-relaxed">
               {displayText}
             </span>
-            <span className={cn("font-mono text-[9px] px-1.5 py-0.5 rounded ml-1.5 inline-block align-middle", tagColor[entry.category])}>
+            <span className={cn("text-[10px] px-1.5 py-0.5 rounded ml-1.5 inline-block align-middle capitalize", tagColor[entry.category])}>
               {entry.category}
             </span>
 
@@ -115,7 +116,7 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
             {isTruncatable && !compact && (
               <button
                 onClick={() => setExpanded((v) => !v)}
-                className="ml-1.5 font-mono text-[9px] text-uac-green hover:underline align-middle"
+                className="ml-1.5 text-[10px] text-uac-green hover:underline align-middle"
               >
                 {expanded ? "show less" : "show more"}
               </button>
@@ -133,9 +134,10 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
           {onEdit && (
             <button
               onClick={handleStartEdit}
-              className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
+              className="p-1 rounded border border-border text-ink4 hover:text-ink hover:border-ink4 transition-colors"
+              aria-label="Edit entry"
             >
-              ✏
+              <Pencil size={11} strokeWidth={2.25} />
             </button>
           )}
           {onDelete && (
@@ -143,16 +145,19 @@ export function LogEntryCard({ entry, compact, onDelete, onEdit }) {
               onClick={handleDelete}
               disabled={deleting}
               className={cn(
-                "font-mono text-[9px] font-semibold px-2 py-0.5 rounded border transition-colors",
+                "p-1 rounded border transition-colors",
                 confirmDel ? "border-uac-red bg-uac-red text-white" : "border-border text-ink5 hover:border-uac-red hover:text-uac-red",
                 deleting && "opacity-50 cursor-wait",
               )}
+              aria-label="Delete entry"
             >
-              {deleting ? "…" : confirmDel ? "Confirm?" : "🗑"}
+              {deleting ? "…" : <Trash2 size={11} strokeWidth={2.25} />}
             </button>
           )}
           {confirmDel && (
-            <button onClick={() => setConfirmDel(false)} className="font-mono text-[9px] text-ink5 hover:text-ink">✕</button>
+            <button onClick={() => setConfirmDel(false)} className="text-ink5 hover:text-ink p-1" aria-label="Cancel">
+              <X size={11} strokeWidth={2.25} />
+            </button>
           )}
         </div>
       )}

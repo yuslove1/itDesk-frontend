@@ -18,7 +18,7 @@ export function Pill({ status, className }) {
   return (
     <span
       className={cn(
-        "font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded-full tracking-wide",
+        "text-[10px] font-semibold px-1.5 py-0.5 rounded-full",
         styles[status],
         className,
       )}

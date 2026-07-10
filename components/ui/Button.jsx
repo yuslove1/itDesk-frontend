@@ -11,23 +11,31 @@ const variants = {
 };
 
 const sizes = {
-  sm: "text-[9px] px-2.5 py-1",
-  md: "text-[10px] px-3 py-1.5",
+  sm: "text-[11px] px-2.5 py-1",
+  md: "text-[12px] px-3 py-1.5",
 };
 
-/** All-purpose button with variant and size props. Any other native <button> props (onClick, disabled, type, etc.) pass through via ...rest. */
-export function Button({ variant = "ghost", size = "md", className, children, ...rest }) {
+const iconSizes = {
+  sm: 12,
+  md: 13,
+};
+
+/** All-purpose button with variant and size props. Pass an `icon` (lucide component) to show it beside the label — defaults to the right, set `iconPosition="left"` to lead with it. Any other native <button> props (onClick, disabled, type, etc.) pass through via ...rest. */
+export function Button({ variant = "ghost", size = "md", icon: Icon, iconPosition = "right", className, children, ...rest }) {
+  const iconEl = Icon && <Icon size={iconSizes[size]} strokeWidth={2.25} />;
   return (
     <button
       className={cn(
-        "font-mono font-semibold uppercase tracking-wide rounded-[6px] inline-flex items-center gap-1.5 cursor-pointer transition-all duration-100 disabled:opacity-50",
+        "font-sans font-semibold rounded-[8px] inline-flex items-center gap-1.5 cursor-pointer transition-all duration-100 disabled:opacity-50",
         variants[variant],
         sizes[size],
         className,
       )}
       {...rest}
     >
+      {iconPosition === "left" && iconEl}
       {children}
+      {iconPosition === "right" && iconEl}
     </button>
   );
 }

@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
+import { Menu } from "lucide-react";
 
 /** App topbar — deep red with green underline.
  *  Shows hamburger on mobile, logo + user info always. */
@@ -12,24 +13,20 @@ export function Topbar({ user, subtitle, actions, onMenuToggle }) {
         className="lg:hidden text-white/70 hover:text-white p-1.5 rounded hover:bg-white/10 transition-colors"
         aria-label="Toggle sidebar"
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <line x1="1" y1="4"  x2="15" y2="4" />
-          <line x1="1" y1="8"  x2="15" y2="8" />
-          <line x1="1" y1="12" x2="15" y2="12" />
-        </svg>
+        <Menu size={17} strokeWidth={2} />
       </button>
 
       {/* Logo */}
-      <div className="font-mono text-[13px] font-semibold text-white tracking-wide flex items-center gap-1.5">
+      <div className="text-[14px] font-bold text-white tracking-wide flex items-center gap-1.5">
         <div className="w-2 h-2 rounded-full bg-uac-green" />
-        <span>IT DESK</span>
+        <span>IT Desk</span>
       </div>
 
       {/* Subtitle — hidden on very small screens */}
       {subtitle && (
         <>
           <div className="hidden sm:block w-px h-[18px] bg-white/10" />
-          <span className="hidden sm:block font-mono text-[10px] text-white/30 tracking-wide truncate">
+          <span className="hidden sm:block text-[11px] text-white/40 truncate">
             {subtitle}
           </span>
         </>
